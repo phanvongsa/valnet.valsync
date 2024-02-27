@@ -17,10 +17,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Component;
 
-import java.sql.CallableStatement;
-import java.sql.Clob;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 import java.util.Map;
 
 @Component
@@ -35,14 +32,15 @@ public class ComponentDao {
     }
 
     public String update(String payload){
-        try{
-            CallableStatement cs = dataSource.getConnection().prepareCall("{ ? = call VN_PEGA_INTEGRATION_API.COMPONENT_GET_JSON_DATA(?)}");
-            Clob jsonParameter = dataSource.getConnection().createClob();
-            jsonParameter.setString(1, payload);
-            cs.registerOutParameter(1, java.sql.Types.VARCHAR);
-            cs.setClob(2, jsonParameter);
-            cs.executeUpdate();
-            return cs.getString(1);
+        try (Connection connection = dataSource.getConnection()){
+            try (CallableStatement cs = connection.prepareCall("{ ? = call VN_PEGA_INTEGRATION_API.COMPONENT_GET_JSON_DATA(?) }")) {
+                Clob clob = connection.createClob();
+                clob.setString(1, payload);
+                cs.setClob(2, clob);
+                cs.registerOutParameter(1, Types.VARCHAR);
+                cs.execute();
+                return cs.getString(1);
+            }
         }catch (Exception e){
             return e.getMessage();
         }
@@ -55,7 +53,7 @@ public class ComponentDao {
             cs.registerOutParameter(1, java.sql.Types.CLOB);
             cs.setInt(2, jo.get("component_id").getAsInt());
             cs.setString(3, jo.get("mode").getAsString());
-            cs.executeUpdate();
+            cs.execute();
             return cs.getString(1);
         }catch (Exception e){
             return e.getMessage();

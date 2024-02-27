@@ -39,24 +39,6 @@ END;
 /
 commit;
 
-create or replace
-FUNCTION component_get_json_data(p_json_data CLOB) RETURN VARCHAR2 IS
-    pragma autonomous_transaction;
-BEGIN
-    flog('FUNCTION CALL','component_get_json_data',p_json_data);
-    COMMIT;
-    RETURN 'OK';
-END component_get_json_data;
-
-CREATE OR REPLACE
-FUNCTION component_send_json_data(p_comp_id INT, p_mode VARCHAR2) RETURN CLOB IS
-  pragma autonomous_transaction;
-BEGIN
-    flog('FUNCTION CALL','component_send_json_data',to_char(p_comp_id,'99999')||':'||p_mode);
-    COMMIT;
-    RETURN '{"status":"OK"}';
-END component_send_json_data;
-
 //+++ CREATE/REPLACE PACKAGE +++//
 CREATE OR REPLACE PACKAGE VN_PEGA_INTEGRATION_API AS
   -- Declare your package-level variables, types, and constants here (if any)
@@ -80,7 +62,7 @@ CREATE OR REPLACE PACKAGE BODY VN_PEGA_INTEGRATION_API AS
     -- Your implementation code
     flog('FUNCTION CALL','component_get_json_data',p1);
     COMMIT;
-    RETURN 'OK';
+    RETURN 'SUCCESS';
   END COMPONENT_GET_JSON_DATA;
 
 
@@ -92,7 +74,7 @@ CREATE OR REPLACE PACKAGE BODY VN_PEGA_INTEGRATION_API AS
     -- Your implementation code
     flog('FUNCTION CALL','component_send_json_data',to_char(p1,'99999')||':'||p2);
     COMMIT;
-    RETURN '{"status":"OK"}';
+    RETURN '{"comp_id":100,"comp_code":"","comp_desc":"","district_code":"","zone_code":""}';
   END COMPONENT_SEND_JSON_DATA;
 
   -- Implement other package elements as needed
