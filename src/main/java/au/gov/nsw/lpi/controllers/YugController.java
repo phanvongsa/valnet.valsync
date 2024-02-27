@@ -22,12 +22,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class YugController{
 
     private static final Logger logger = LoggerFactory.getLogger(YugController.class);
-    private final AppConfig appConfig;
+
     private final ServerConfig serverConfig;
 
     private final DataSource dataSource;
-    public YugController(AppConfig appConfig, ServerConfig serverConfig, DataSource dataSource) {
-        this.appConfig = appConfig;
+    public YugController(ServerConfig serverConfig,DataSource dataSource) {
         this.serverConfig = serverConfig;
         this.dataSource = dataSource;
     }
