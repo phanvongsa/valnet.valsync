@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{yyyyddMM:HHmmss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+        </layout>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${catalina.home}/logs/valsync.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${catalina.home}/logs/valsync.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>14</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyyddMM:HHmmss.SSS} [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${catalina.home}/logs/valsync_debug.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${catalina.home}/logs/valsync_debug.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>1</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyyddMM:HHmmss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!-- logger name="com.base22" level="TRACE"/ -->
+    <logger name="valnet.valsync.app" level="TRACE" />
+    <logger name="org.apache" level="ERROR" />
+    <logger name="org.springframework" level="ERROR" />
+    <logger name="org.hibernate" level="ERROR" />
+    <logger name="java.sql" level="ERROR" />
+    <logger name="jdbc.audit" level="ERROR" />
+    <logger name="jdbc.connection" level="ERROR" />
+    <logger name="jdbc.sqltiming" level="ERROR" />
+    <logger name="jdbc.resultset" level="ERROR" />
+    <logger name="jdbc.resultsettable" level="ERROR" />
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+        <appender-ref ref="DEBUG" />
+    </root>
+</configuration>
