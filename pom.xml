@@ -188,6 +188,7 @@
   </dependencies>
 
   <build>
+    <finalName>${project.artifactId}-${env}</finalName>
     <pluginManagement>
       <plugins>
         <plugin>
