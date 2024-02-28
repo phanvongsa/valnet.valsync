@@ -10,12 +10,12 @@ import org.springframework.http.ResponseEntity;
 
 import com.google.gson.Gson;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Utils {
     public static ResponseEntity<String> getAsResponseEntity(Object o) {
-
         StandardisedResponse standardisedResponse = new StandardisedResponse(ResponseCode.SUCCESS, "Success", null);
         String raw_response = o.toString();
         Gson gson = new Gson();
@@ -39,4 +39,27 @@ public class Utils {
             return false;
         }
     }
+
+    public static String getRequestRemoteAddress(HttpServletRequest request) {
+        String remoteAddress = request.getHeader("X-FORWARDED-FOR");
+        if (remoteAddress == null || "".equals(remoteAddress)) {
+            remoteAddress = request.getRemoteAddr();
+        }
+        return remoteAddress;
+    }
+
+    public static boolean isInCommaDelimitedList(String commaDelimitedList, String targetString) {
+        // Split the comma-delimited list
+        String[] items = commaDelimitedList.split(",");
+
+        // Search for the target string in the array
+        for (String item : items) {
+            if (item.trim().equals(targetString)) {
+                return true; // String found
+            }
+        }
+
+        return false; // String not found
+    }
+
 }
