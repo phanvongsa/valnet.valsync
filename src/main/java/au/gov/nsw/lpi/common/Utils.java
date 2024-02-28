@@ -10,20 +10,25 @@ import org.springframework.http.ResponseEntity;
 
 import com.google.gson.Gson;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Utils {
     public static ResponseEntity<String> getAsResponseEntity(Object o) {
-        final HttpHeaders headers = new HttpHeaders();
-        String response_content = o.toString();
-        if(o instanceof String) {
-            headers.setContentType(MediaType.TEXT_PLAIN);
-        } else {
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            Gson gson = new Gson();
-            response_content = gson.toJson(o);
+
+        StandardisedResponse standardisedResponse = new StandardisedResponse(ResponseCode.SUCCESS, "Success", null);
+        String raw_response = o.toString();
+        Gson gson = new Gson();
+        if(raw_response.toLowerCase().contains("error")){
+            standardisedResponse.code= ResponseCode.ERROR;
+            standardisedResponse.message = raw_response;
+        }else{
+            standardisedResponse.data = Utils.isValidJson(raw_response)? gson.fromJson(raw_response, Object.class) : raw_response;
         }
 
+        final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        return new ResponseEntity<>(response_content, headers, HttpStatus.OK);
+        return new ResponseEntity<>(gson.toJson(standardisedResponse), headers, HttpStatus.OK);
     }
 
     public static boolean isValidJson(String jsonString) {
@@ -34,18 +39,4 @@ public class Utils {
             return false;
         }
     }
-/*
-    public static Boolean isJson(Object o) {
-        try {
-            gson.fromJson(o, Object.class);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public static String getAsJson(Object o) {
-        return gson.toJson(o);
-    }
- */
 }
