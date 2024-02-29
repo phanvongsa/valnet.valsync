@@ -62,7 +62,6 @@ public class Utils {
                 return true; // String found
             }
         }
-
         return false; // String not found
     }
 

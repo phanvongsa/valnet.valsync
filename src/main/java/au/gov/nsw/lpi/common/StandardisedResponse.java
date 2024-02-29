@@ -1,5 +1,8 @@
 package au.gov.nsw.lpi.common;
 
+import au.gov.nsw.lpi.controllers.ComponentController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,6 +14,7 @@ public class StandardisedResponse {
     public String message;
     public Object data;
 
+    private static final Logger logger = LoggerFactory.getLogger(ComponentController.class);
     public StandardisedResponse(HttpStatus httpStatus, Object data) {
         this.httpStatus = httpStatus;
         this.data = data;
@@ -48,6 +52,11 @@ public class StandardisedResponse {
     }
 
     public void setData(Object data){
+        if(data.toString().toLowerCase().contains("error")){
+            this.httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            initialiseCodeMessage();
+        }
+
         if(data instanceof String && Utils.isValidJson(data.toString())){
             this.data = Utils.json2Object(data.toString());
         }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 
 @Component
-public class SecurityService {
+public class SecurityService implements ISecurityService{
     public final String apiKey;
     private final String allowedIps;
     private final String apiKeyName;
@@ -21,6 +21,7 @@ public class SecurityService {
         this.allowedIps = serverConfig.allowedIps;
     }
 
+    @Override
     public boolean isRequestValid(HttpServletRequest request) {
         // check request header api key matches expected
         if(request.getHeader(this.apiKeyName)== null || !request.getHeader(this.apiKeyName).equals(this.apiKey))
@@ -30,6 +31,7 @@ public class SecurityService {
         return this.allowedIps.equals("*") || Utils.isInCommaDelimitedList(this.allowedIps, Utils.getRequestRemoteAddress(request));
     }
 
+    @Override
     public StandardisedResponse requestSecurityCheck(HttpServletRequest request) {
         if(isRequestValid(request))
             return new StandardisedResponse(HttpStatus.OK,null);

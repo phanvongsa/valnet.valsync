@@ -1,8 +1,5 @@
 package au.gov.nsw.lpi.domain;
 
-//import org.hibernate.cfg.Environment;
-//import org.springframework.stereotype.Component;
-//import org.springframework.core.env.Environment;
 import org.springframework.core.env.Environment;
 public class ServerConfig {
     public String serverEnvironment;

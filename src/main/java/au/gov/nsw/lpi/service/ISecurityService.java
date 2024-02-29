@@ -1,0 +1,10 @@
+package au.gov.nsw.lpi.service;
+
+import au.gov.nsw.lpi.common.StandardisedResponse;
+
+import javax.servlet.http.HttpServletRequest;
+public interface ISecurityService {
+    boolean isRequestValid(HttpServletRequest request);
+
+    StandardisedResponse requestSecurityCheck(HttpServletRequest request);
+}
