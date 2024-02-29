@@ -19,4 +19,11 @@ public class AppConfig {
         return ds;
     }
 
+    @Bean
+    public ServerConfig serverConfig(Environment env) {
+        ServerConfig cfg = new ServerConfig();
+        cfg.init(env);
+        return cfg;
+    }
+
 }

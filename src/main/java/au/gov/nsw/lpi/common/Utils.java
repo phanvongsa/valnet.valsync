@@ -11,24 +11,18 @@ import org.springframework.http.ResponseEntity;
 import com.google.gson.Gson;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Utils {
     public static ResponseEntity<String> getAsResponseEntity(Object o) {
-        StandardisedResponse standardisedResponse = new StandardisedResponse(ResponseCode.SUCCESS, "Success", null);
-        String raw_response = o.toString();
+        StandardisedResponse standardisedResponse;
         Gson gson = new Gson();
-        if(raw_response.toLowerCase().contains("error")){
-            standardisedResponse.code= ResponseCode.ERROR;
-            standardisedResponse.message = raw_response;
-        }else{
-            standardisedResponse.data = Utils.isValidJson(raw_response)? gson.fromJson(raw_response, Object.class) : raw_response;
-        }
+        String raw_response = o.toString();
+        if(raw_response.toLowerCase().contains("error"))
+            standardisedResponse = new StandardisedResponse(HttpStatus.INTERNAL_SERVER_ERROR,raw_response);
+        else
+            standardisedResponse = new StandardisedResponse(HttpStatus.OK,Utils.isValidJson(raw_response)? gson.fromJson(raw_response, Object.class) : raw_response);
 
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        return new ResponseEntity<>(gson.toJson(standardisedResponse), headers, HttpStatus.OK);
+        return standardisedResponse.getResponseEntity();
     }
 
     public static boolean isValidJson(String jsonString) {
@@ -38,6 +32,16 @@ public class Utils {
         } catch (JsonSyntaxException e) {
             return false;
         }
+    }
+
+    public static Object json2Object(String jsonString){
+        Gson gson = new Gson();
+        return gson.fromJson(jsonString,Object.class);
+    }
+
+    public static String object2Json(Object object){
+        Gson gson = new Gson();
+        return gson.toJson(object);
     }
 
     public static String getRequestRemoteAddress(HttpServletRequest request) {

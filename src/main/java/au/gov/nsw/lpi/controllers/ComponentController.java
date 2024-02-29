@@ -1,12 +1,14 @@
 package au.gov.nsw.lpi.controllers;
 
-import au.gov.nsw.lpi.common.ResponseCode;
-import au.gov.nsw.lpi.common.Security;
+import au.gov.nsw.lpi.common.StandardisedResponseCode;
+
 import au.gov.nsw.lpi.common.StandardisedResponse;
 import au.gov.nsw.lpi.common.Utils;
 import au.gov.nsw.lpi.dao.ComponentDao;
+import au.gov.nsw.lpi.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,43 +24,38 @@ public class ComponentController {
     private static final Logger logger = LoggerFactory.getLogger(ComponentController.class);
     private final ComponentDao componentDao;
 
-    private final Security security;
+    private final SecurityService securityService;
 
-    ComponentController(ComponentDao componentDao, Security security) {
+    ComponentController(ComponentDao componentDao, SecurityService securityService) {
         this.componentDao = componentDao;
-        this.security = security;
+        this.securityService = securityService;
     }
 
     @RequestMapping(value="/{actionName}", method = POST)
     public ResponseEntity<String> doPost(@PathVariable String actionName, @RequestBody String requestBody, HttpServletRequest request) {
-        logger.info("Received request: " + requestBody);
-        StandardisedResponse securityResponse = securityRequestCheck(request);
-        if(securityResponse.code != ResponseCode.SUCCESS)
-            return Utils.getAsResponseEntity(securityResponse.message);
+
+        StandardisedResponse standardisedResponse =securityService.requestSecurityCheck(request);
+        if (standardisedResponse.code != StandardisedResponseCode.SUCCESS)
+            return standardisedResponse.getResponseEntity();
 
         if(!Utils.isValidJson(requestBody))
-            return Utils.getAsResponseEntity("Error Invalid JSON");
-
-        String response_db = "";
-        switch(actionName.toLowerCase()){
-            case "update":
-                response_db = componentDao.update(requestBody);
-                break;
-            case "retrieve":
-                response_db = componentDao.retrieve(requestBody);
-                break;
-            default:
-                response_db = "Error: Invalid Action";
-                break;
+            standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,"Malformed JSON");
+        else{
+            String response_db = "";
+            switch(actionName.toLowerCase()){
+                case "update":
+                    standardisedResponse.setData(componentDao.update(requestBody));// data = ;
+                    break;
+                case "retrieve":
+                    standardisedResponse.setData(componentDao.retrieve(requestBody));
+                    break;
+                default:
+                    standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,"Invalid Request Action Call");
+                    break;
+            }
         }
-        return Utils.getAsResponseEntity(response_db);
+
+        return standardisedResponse.getResponseEntity();
     }
 
-    private StandardisedResponse securityRequestCheck(HttpServletRequest request) {
-        if(security.isRequestValid(request))
-            return new StandardisedResponse(ResponseCode.SUCCESS, "Security Pass", null);
-
-        return new StandardisedResponse(ResponseCode.ERROR, "Error: Security Fail", null);
-
-    }
 }

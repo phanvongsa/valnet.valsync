@@ -20,9 +20,9 @@ if [[ $act == *"build"* ]]; then
   eval " $__sh"
 fi
 
-destfilename=valsync-1.0
-prf=SNAPSHOT
+
 if [[ $act == *"deploy"* ]]; then
+  destfilename=valsync
   __srcwar="./target/${destfilename}-${prf}.war"
   __dirwar="/mnt/c/GDRIVE/dev/docker/docker-data/services.tomcat/${destfilename}.war"
   
@@ -30,7 +30,6 @@ if [[ $act == *"deploy"* ]]; then
   __sh="cp ${__srcwar} ${__dirwar}"
   echo "    copying to docker war dir"
   eval " $__sh"
-  destfilename=valsync
   __sh="docker cp ${__dirwar} tomcat:/usr/local/tomcat/webapps/${destfilename}.war"
   echo "    deploying to Tomcat server"
   eval " $__sh"
