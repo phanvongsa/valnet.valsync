@@ -46,6 +46,7 @@ CREATE OR REPLACE PACKAGE VN_PEGA_INTEGRATION_API AS
   -- Declare your package functions
   FUNCTION COMPONENT_GET_JSON_DATA(p1 Clob) RETURN varchar;
   FUNCTION COMPONENT_SEND_JSON_DATA(p1 Int, p2 VARCHAR) RETURN Clob;
+  FUNCTION PROPERTY_GET_JSON_DATA(p1 Clob) RETURN varchar;
 
   -- Declare other package elements as needed
 END VN_PEGA_INTEGRATION_API;
@@ -65,6 +66,17 @@ CREATE OR REPLACE PACKAGE BODY VN_PEGA_INTEGRATION_API AS
     RETURN 'SUCCESS';
   END COMPONENT_GET_JSON_DATA;
 
+-- Implement your package functions
+  FUNCTION PROPERTY_GET_JSON_DATA(p1 Clob) RETURN varchar IS
+    -- Function logic goes here
+    -- You can use PL/SQL statements, variables, and other constructs
+	pragma autonomous_transaction;
+  BEGIN
+    -- Your implementation code
+    flog('FUNCTION CALL','property_get_json_data',p1);
+    COMMIT;
+    RETURN 'SUCCESS';
+  END PROPERTY_GET_JSON_DATA;
 
   FUNCTION COMPONENT_SEND_JSON_DATA(p1 Int, p2 VARCHAR) RETURN Clob IS
     -- Function logic goes here

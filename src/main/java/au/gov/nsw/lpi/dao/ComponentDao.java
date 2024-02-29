@@ -18,7 +18,7 @@ public class ComponentDao extends BaseDao implements IComponentDao{
     }
 
     @Override
-    public String update(String payload){
+    public String COMPONENT_GET_JSON_DATA(String payload){
         String sql = String.format("{ ? = call %s.COMPONENT_GET_JSON_DATA(?) }",this.catalogName);
         logger.debug(sql);
         try (Connection connection = dataSource.getConnection()){
@@ -36,7 +36,7 @@ public class ComponentDao extends BaseDao implements IComponentDao{
     }
 
     @Override
-    public String retrieve(String payload){
+    public String COMPONENT_SEND_JSON_DATA(String payload){
         String sql = String.format("{ ? = call %s.COMPONENT_SEND_JSON_DATA(?, ?)}", this.catalogName);
         logger.debug(sql);
         try (Connection connection = dataSource.getConnection()){

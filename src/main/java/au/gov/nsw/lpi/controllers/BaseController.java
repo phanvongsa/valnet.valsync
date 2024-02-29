@@ -8,19 +8,21 @@ import au.gov.nsw.lpi.service.ISecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-public class BaseController {
+public abstract class BaseController {
     protected static final Logger logger = LoggerFactory.getLogger(ComponentController.class);
-    protected final IBaseDao iDao;
+    protected IBaseDao iDao;
 
-    protected final ISecurityService securityService;
+    protected ISecurityService securityService;
 
-    public BaseController(IBaseDao iDao, ISecurityService securityService){
+    public BaseController(){
+
+    }
+    protected void initialise(IBaseDao iDao, ISecurityService securityService){
         this.iDao = iDao;
         this.securityService = securityService;
     }
@@ -35,6 +37,5 @@ public class BaseController {
             standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,"Malformed JSON");
 
         return standardisedResponse;
-
     }
 }

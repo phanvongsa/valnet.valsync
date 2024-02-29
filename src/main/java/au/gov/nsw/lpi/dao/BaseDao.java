@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 
-public class BaseDao implements IBaseDao{
-    protected static final Logger logger = LoggerFactory.getLogger(ComponentDao.class);
+public abstract class BaseDao implements IBaseDao{
+    protected static final Logger logger = LoggerFactory.getLogger(BaseDao.class);
     protected final DataSource dataSource;
     protected final String catalogName = "VN_PEGA_INTEGRATION_API";
 
