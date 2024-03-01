@@ -4,16 +4,13 @@ package au.gov.nsw.lpi.controllers;
 import au.gov.nsw.lpi.common.StandardisedResponse;
 import au.gov.nsw.lpi.common.StandardisedResponseCode;
 import au.gov.nsw.lpi.common.Utils;
-import au.gov.nsw.lpi.domain.AppConfig;
+import au.gov.nsw.lpi.dao.PropertyDao;
 import au.gov.nsw.lpi.domain.ServerConfig;
 
-import au.gov.nsw.lpi.service.SecurityService;
-import com.google.gson.Gson;
+import au.gov.nsw.lpi.service.SecurityServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,10 +29,10 @@ public class YugController{
     private static final Logger logger = LoggerFactory.getLogger(YugController.class);
 
     private final ServerConfig serverConfig;
-    private final SecurityService securityService;
+    private final SecurityServiceImpl securityService;
 
     private final DataSource dataSource;
-    public YugController(ServerConfig serverConfig, DataSource dataSource,  SecurityService securityService) {
+    public YugController(ServerConfig serverConfig, DataSource dataSource,  SecurityServiceImpl securityService) {
         this.serverConfig = serverConfig;
         this.dataSource = dataSource;
         this.securityService = securityService;

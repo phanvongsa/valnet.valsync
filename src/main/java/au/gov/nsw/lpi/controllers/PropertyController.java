@@ -2,11 +2,8 @@ package au.gov.nsw.lpi.controllers;
 
 import au.gov.nsw.lpi.common.StandardisedResponse;
 import au.gov.nsw.lpi.common.StandardisedResponseCode;
-import au.gov.nsw.lpi.dao.IBaseDao;
-import au.gov.nsw.lpi.dao.IComponentDao;
-import au.gov.nsw.lpi.dao.IPropertyDao;
-import au.gov.nsw.lpi.service.ISecurityService;
-import org.springframework.http.HttpStatus;
+import au.gov.nsw.lpi.dao.PropertyDao;
+import au.gov.nsw.lpi.service.SecurityService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,10 +17,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 @RequestMapping(value = "/property")
 public class PropertyController extends BaseController{
-    PropertyController(IPropertyDao propertyDao, ISecurityService securityService) {
+    PropertyController(PropertyDao propertyDao, SecurityService securityService) {
         super();
-        initialise((IBaseDao)propertyDao, securityService);
+        initialise(propertyDao, securityService);
     }
+
 
     @RequestMapping(value="/{actionName}", method = POST)
     public ResponseEntity<String> doPost(@PathVariable String actionName, @RequestBody String requestBody, HttpServletRequest request) {
@@ -32,20 +30,22 @@ public class PropertyController extends BaseController{
         if (standardisedResponse.code != StandardisedResponseCode.SUCCESS)
             return standardisedResponse.getResponseEntity();
 
-        IPropertyDao dao = (IPropertyDao)this.iDao;
-        switch(actionName.toLowerCase()){
-            case "update":
-                standardisedResponse.setData(dao.PROPERTY_GET_JSON_DATA(requestBody));
-                break;
-//            case "retrieve":
-//                standardisedResponse.setData(dao.retrieve(requestBody));
+        //this.daoService.get
+        //PropertyDao dao = (PropertyDao)this.iDao;
+//        switch(actionName.toLowerCase()){
+//            case "update":
+//                standardisedResponse.setData(dao.PROPERTY_GET_JSON_DATA(requestBody));
 //                break;
-            default:
-                standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,"Invalid Request Action Call");
-                break;
-        }
+////            case "retrieve":
+////                standardisedResponse.setData(dao.retrieve(requestBody));
+////                break;
+//            default:
+//                standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,"Invalid Request Action Call");
+//                break;
+//        }
 
         return standardisedResponse.getResponseEntity();
     }
 
 }
+
