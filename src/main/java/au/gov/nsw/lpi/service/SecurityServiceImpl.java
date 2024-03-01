@@ -4,11 +4,11 @@ import au.gov.nsw.lpi.common.StandardisedResponse;
 import au.gov.nsw.lpi.common.Utils;
 import au.gov.nsw.lpi.domain.ServerConfig;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 
-@Component
+@Service
 public class SecurityServiceImpl implements SecurityService {
     public final String apiKey;
     private final String allowedIps;

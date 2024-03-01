@@ -16,6 +16,7 @@
     <org.slf4j.version>1.7.32</org.slf4j.version>
     <ch.qos.logback.version>1.2.6</ch.qos.logback.version>
     <com.oracle.database.jdbc.version>19.18.0.0</com.oracle.database.jdbc.version>
+    <org.apache.httpcomponents.version>4.5.14</org.apache.httpcomponents.version>
   </properties>
 
   <profiles>
@@ -124,6 +125,13 @@
       <version>${gson.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>${org.apache.httpcomponents.version}</version>
+    </dependency>
+
+
     <!-- spring -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -183,6 +191,11 @@
       <artifactId>junit-jupiter</artifactId>
       <version>5.10.2</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+      <version>4.4.14</version>
     </dependency>
 
   </dependencies>

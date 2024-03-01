@@ -4,6 +4,7 @@ import au.gov.nsw.lpi.common.StandardisedResponse;
 import au.gov.nsw.lpi.common.StandardisedResponseCode;
 import au.gov.nsw.lpi.dao.PropertyDao;
 import au.gov.nsw.lpi.service.SecurityService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,18 +32,18 @@ public class PropertyController extends BaseController{
             return standardisedResponse.getResponseEntity();
 
         //this.daoService.get
-        //PropertyDao dao = (PropertyDao)this.iDao;
-//        switch(actionName.toLowerCase()){
-//            case "update":
-//                standardisedResponse.setData(dao.PROPERTY_GET_JSON_DATA(requestBody));
+        PropertyDao dao = (PropertyDao)this.iDao;
+        switch(actionName.toLowerCase()){
+            case "update":
+                standardisedResponse.setData(dao.PROPERTY_GET_JSON_DATA(requestBody));
+                break;
+//            case "retrieve":
+//                standardisedResponse.setData(dao.retrieve(requestBody));
 //                break;
-////            case "retrieve":
-////                standardisedResponse.setData(dao.retrieve(requestBody));
-////                break;
-//            default:
-//                standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,"Invalid Request Action Call");
-//                break;
-//        }
+            default:
+                standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,"Invalid Request Action Call");
+                break;
+        }
 
         return standardisedResponse.getResponseEntity();
     }

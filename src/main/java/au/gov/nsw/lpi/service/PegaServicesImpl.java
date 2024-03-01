@@ -1,0 +1,71 @@
+package au.gov.nsw.lpi.service;
+
+import au.gov.nsw.lpi.common.Utils;
+import au.gov.nsw.lpi.domain.PegaConfig;
+import org.apache.http.HttpStatus;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.springframework.stereotype.Service;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClients;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+
+@Service
+public class PegaServicesImpl implements PegaServices {
+    private final String baseurl;
+//    private final String username;
+//    private final String password;
+
+    private final HttpClient httpClient;;
+
+    public PegaServicesImpl(PegaConfig cfg){
+        this.baseurl = cfg.baseurl;
+//        this.username = cfg.username;
+//        this.password = cfg.password;
+        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(cfg.username, cfg.password));
+        this.httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
+    }
+    @Override
+    public Map<String, Object> test(String payload) {
+        String apiUrl = String.format("%s/valsync/property/related", this.baseurl);
+        Map<String, Object> nfo = new HashMap<>();
+        try {
+            HttpPost req = new HttpPost(apiUrl);
+            HttpResponse response = httpClient.execute(req);
+            int statusCode = response.getStatusLine().getStatusCode();
+            //if(statusCode==200)
+            nfo.put("responseStatusCode",response.getStatusLine().getStatusCode());
+            nfo.put("responseBody",getResponseBody(response));
+        }catch (Exception ex){
+            nfo.put("responseStatusCode",500);
+            nfo.put("responseBody", ex.getMessage());
+        }
+        return nfo;
+    }
+
+    private String getResponseBody(HttpResponse response){
+        try{
+            BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            StringBuilder responseBody = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                responseBody.append(line);
+            }
+            reader.close();
+            return responseBody.toString();
+        }catch (Exception ex){
+            return ex.getMessage();
+        }
+    }
+}

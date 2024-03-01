@@ -26,4 +26,11 @@ public class AppConfig {
         return cfg;
     }
 
+    @Bean
+    public PegaConfig pegaConfig(Environment env) {
+        PegaConfig cfg = new PegaConfig();
+        cfg.init(env);
+        return cfg;
+    }
+
 }
