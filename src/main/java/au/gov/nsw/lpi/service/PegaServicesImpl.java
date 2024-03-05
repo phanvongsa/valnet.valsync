@@ -7,6 +7,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.springframework.stereotype.Service;
 import org.apache.http.HttpResponse;
@@ -23,35 +24,38 @@ import java.util.Objects;
 @Service
 public class PegaServicesImpl implements PegaServices {
     private final String baseurl;
-//    private final String username;
-//    private final String password;
 
     private final HttpClient httpClient;;
 
     public PegaServicesImpl(PegaConfig cfg){
         this.baseurl = cfg.baseurl;
-//        this.username = cfg.username;
-//        this.password = cfg.password;
         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(cfg.username, cfg.password));
         this.httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
     }
+
     @Override
-    public Map<String, Object> test(String payload) {
-        String apiUrl = String.format("%s/valsync/property/related", this.baseurl);
+    public Map<String, Object> property_related(String payload) {
+        String api_url = String.format("%s/valsync/property/related", this.baseurl);
         Map<String, Object> nfo = new HashMap<>();
         try {
-            HttpPost req = new HttpPost(apiUrl);
-            HttpResponse response = httpClient.execute(req);
-            int statusCode = response.getStatusLine().getStatusCode();
-            //if(statusCode==200)
-            nfo.put("responseStatusCode",response.getStatusLine().getStatusCode());
-            nfo.put("responseBody",getResponseBody(response));
+            HttpPost req = new HttpPost(api_url);
+            req.setEntity(new StringEntity(payload));
+            setResponseMap(nfo, httpClient.execute(req));
         }catch (Exception ex){
-            nfo.put("responseStatusCode",500);
-            nfo.put("responseBody", ex.getMessage());
+            setResponseMap(nfo, ex);
         }
         return nfo;
+    }
+
+    private void setResponseMap(Map<String, Object> nfo, HttpResponse response){
+        nfo.put("responseStatusCode",response.getStatusLine().getStatusCode());
+        nfo.put("responseBody",getResponseBody(response));
+    }
+
+    private void setResponseMap(Map<String, Object> nfo, Exception ex){
+        nfo.put("responseStatusCode",500);
+        nfo.put("responseBody", ex.getMessage());
     }
 
     private String getResponseBody(HttpResponse response){
@@ -67,5 +71,21 @@ public class PegaServicesImpl implements PegaServices {
         }catch (Exception ex){
             return ex.getMessage();
         }
+    }
+
+    @Override
+    public Map<String, Object> test(String payload) {
+        String apiUrl = String.format("%s/valsync/property/related", this.baseurl);
+        Map<String, Object> nfo = new HashMap<>();
+        try {
+            HttpPost req = new HttpPost(apiUrl);
+            HttpResponse response = httpClient.execute(req);
+            nfo.put("responseStatusCode",response.getStatusLine().getStatusCode());
+            nfo.put("responseBody",getResponseBody(response));
+        }catch (Exception ex){
+            nfo.put("responseStatusCode",500);
+            nfo.put("responseBody", ex.getMessage());
+        }
+        return nfo;
     }
 }

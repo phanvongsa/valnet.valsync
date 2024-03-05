@@ -126,3 +126,24 @@ end;
 
 === valiq
 
+--  SET SERVEROUTPUT ON
+DECLARE
+  v_connection UTL_TCP.connection;
+BEGIN
+  -- Replace 'hostname' and 'port' with the actual values you want to test
+  /*
+  v_connection := UTL_TCP.open_connection('localhost', 8092 => port_number);
+
+  IF UTL_TCP.is_open(v_connection) THEN
+    DBMS_OUTPUT.put_line('Connection successful.');
+    UTL_TCP.close_connection(v_connection);
+  ELSE
+    DBMS_OUTPUT.put_line('Connection failed.');
+  END IF;
+  */
+  DBMS_OUTPUT.put_line('Connection failed.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.put_line('Error: ' || SQLERRM);
+END;
+/

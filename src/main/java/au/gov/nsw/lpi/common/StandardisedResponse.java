@@ -34,7 +34,7 @@ public class StandardisedResponse {
                 this.message = "Unauthorised Access";
                 break;
             case BAD_REQUEST:
-                this.message = "Malformed JSON";
+                this.message = "Incorrect API URL or Malformed JSON";
                 break;
             case FORBIDDEN:
                 this.message = "Forbidden Access";

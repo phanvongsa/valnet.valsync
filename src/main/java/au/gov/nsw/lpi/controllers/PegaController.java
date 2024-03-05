@@ -2,6 +2,7 @@ package au.gov.nsw.lpi.controllers;
 
 import au.gov.nsw.lpi.common.StandardisedResponse;
 import au.gov.nsw.lpi.common.StandardisedResponseCode;
+import au.gov.nsw.lpi.common.Utils;
 import au.gov.nsw.lpi.dao.PropertyDao;
 import au.gov.nsw.lpi.service.PegaServices;
 import au.gov.nsw.lpi.service.SecurityService;
@@ -13,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -32,23 +36,28 @@ public class PegaController extends BaseController {
         if (standardisedResponse.code != StandardisedResponseCode.SUCCESS)
             return standardisedResponse.getResponseEntity();
 
+        String entityAction = (entityName+"/"+actionName).toLowerCase();
+        switch(entityAction){
+            case "property/related":
+                setWithPegaResponse(standardisedResponse, pegaServices.property_related(requestBody));
+                break;
+//            case "retrieve":
+//                standardisedResponse.setData(dao.retrieve(requestBody));
+//                break;
+            default:
+                standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,"Invalid Request Action Call");
+                break;
+        }
 
-        standardisedResponse.data = pegaServices.test(requestBody);
-//        //this.daoService.get
-//        PropertyDao dao = (PropertyDao)this.iDao;
-//        switch(actionName.toLowerCase()){
-//            case "update":
-//                standardisedResponse.setData(dao.PROPERTY_GET_JSON_DATA(requestBody));
-//                break;
-////            case "retrieve":
-////                standardisedResponse.setData(dao.retrieve(requestBody));
-////                break;
-//            default:
-//                standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,"Invalid Request Action Call");
-//                break;
-//        }
 
         return standardisedResponse.getResponseEntity();
     }
 
+    private void setWithPegaResponse(StandardisedResponse standardisedResponse, Map<String,Object> pegaResponse){
+        logger.debug(Utils.object2Json(pegaResponse));
+        if((int)pegaResponse.get("responseStatusCode")==200)
+            standardisedResponse.setData(pegaResponse.get("responseBody").toString());
+        else
+            standardisedResponse = new StandardisedResponse(HttpStatus.INTERNAL_SERVER_ERROR,pegaResponse.get("responseBody").toString());
+    }
 }
