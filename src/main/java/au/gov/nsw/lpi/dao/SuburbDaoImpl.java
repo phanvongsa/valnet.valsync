@@ -11,22 +11,19 @@ import java.sql.Connection;
 import java.sql.Types;
 
 @Component
-public class ComponentDaoImpl extends BaseDaoImp implements ComponentDao {
-
-    public ComponentDaoImpl(DataSource dataSource) {
+public class SuburbDaoImpl extends BaseDaoImp implements SuburbDao {
+    public SuburbDaoImpl(DataSource dataSource) {
         super(dataSource);
     }
-
     @Override
-    public String COMPONENT_GET_JSON_DATA(String payload){
-        String sql = String.format("{ ? = call %s.COMPONENT_GET_JSON_DATA(?) }",this.catalogName);
-//        logger.debug(sql);
+    public String STREET_UPSERT(String payload) {
+        String sql = String.format("{ ? = call %s.PARSE_STREET_SUBURB_FROM_VALIQ(?) }",this.catalogName);
         try (Connection connection = dataSource.getConnection()){
             try (CallableStatement cs = connection.prepareCall(sql)) {
                 Clob clob = connection.createClob();
                 clob.setString(1, payload);
                 cs.setClob(2, clob);
-                cs.registerOutParameter(1, Types.VARCHAR);
+                cs.registerOutParameter(1, Types.CLOB);
                 cs.execute();
                 return cs.getString(1);
             }
@@ -36,15 +33,14 @@ public class ComponentDaoImpl extends BaseDaoImp implements ComponentDao {
     }
 
     @Override
-    public String COMPONENT_SEND_JSON_DATA(String payload){
-        String sql = String.format("{ ? = call %s.COMPONENT_SEND_JSON_DATA(?, ?)}", this.catalogName);
-//        logger.debug(sql);
+    public String DISTRICT_UPSERT(String payload) {
+        String sql = String.format("{ ? = call %s.PARSE_SUB_DIST_VALIQ(?) }",this.catalogName);
         try (Connection connection = dataSource.getConnection()){
             try (CallableStatement cs = connection.prepareCall(sql)) {
-                JsonObject jo = JsonParser.parseString(payload).getAsJsonObject();
+                Clob clob = connection.createClob();
+                clob.setString(1, payload);
+                cs.setClob(2, clob);
                 cs.registerOutParameter(1, Types.CLOB);
-                cs.setInt(2, jo.get("component_id").getAsInt());
-                cs.setString(3, jo.get("mode").getAsString());
                 cs.execute();
                 return cs.getString(1);
             }
@@ -52,5 +48,4 @@ public class ComponentDaoImpl extends BaseDaoImp implements ComponentDao {
             return getExceptionResponse(e);
         }
     }
-
 }

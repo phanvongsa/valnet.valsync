@@ -3,7 +3,7 @@
 $ mvn clean package -Plocal
 
 -- run on docker machine
-##> mvn clean package -Plocal -f .\datasync\pom.xml ;wsl ./__tools.sh -p local -a deploy
+##> mvn clean package -Plocal -f ./pom.xml ;wsl ./__tools.sh -p local -a deploy
 
 //** **//
 -- run in docker as sys SQLPLUS>
@@ -47,6 +47,8 @@ CREATE OR REPLACE PACKAGE VN_PEGA_INTEGRATION_API AS
   FUNCTION COMPONENT_GET_JSON_DATA(p1 Clob) RETURN varchar;
   FUNCTION COMPONENT_SEND_JSON_DATA(p1 Int, p2 VARCHAR) RETURN Clob;
   FUNCTION PROPERTY_GET_JSON_DATA(p1 Clob) RETURN varchar;
+  FUNCTION PARSE_SUB_DIST_VALIQ(p1 Clob) RETURN Clob;
+  FUNCTION PARSE_STREET_SUBURB_FROM_VALIQ(p1 Clob) RETURN Clob;
 
   -- Declare other package elements as needed
 END VN_PEGA_INTEGRATION_API;
@@ -89,6 +91,27 @@ CREATE OR REPLACE PACKAGE BODY VN_PEGA_INTEGRATION_API AS
     RETURN '{"comp_id":100,"comp_code":"","comp_desc":"","district_code":"","zone_code":""}';
   END COMPONENT_SEND_JSON_DATA;
 
+  FUNCTION PARSE_SUB_DIST_VALIQ(p1 Clob) RETURN Clob IS
+    -- Function logic goes here
+    -- You can use PL/SQL statements, variables, and other constructs
+    pragma autonomous_transaction;
+  BEGIN
+    -- Your implementation code
+    flog('FUNCTION CALL','parse_sub_dist_valiq',p1);
+    COMMIT;
+    RETURN 'SUCCESS';
+  END PARSE_SUB_DIST_VALIQ;
+
+  FUNCTION PARSE_STREET_SUBURB_FROM_VALIQ(p1 Clob) RETURN Clob IS
+      -- Function logic goes here
+      -- You can use PL/SQL statements, variables, and other constructs
+      pragma autonomous_transaction;
+    BEGIN
+      -- Your implementation code
+      flog('FUNCTION CALL','parse_street_suburb_from_valiq',p1);
+      COMMIT;
+      RETURN 'SUCCESS';
+    END PARSE_STREET_SUBURB_FROM_VALIQ;
   -- Implement other package elements as needed
 END VN_PEGA_INTEGRATION_API;
 /
