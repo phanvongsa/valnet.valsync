@@ -35,7 +35,7 @@ public class PropertyController extends BaseController{
         PropertyDao dao = (PropertyDao)this.iDao;
         switch(actionName.toLowerCase()){
             case "update":
-                standardisedResponse.setData(dao.PROPERTY_GET_JSON_DATA(requestBody));
+                standardisedResponse.setData(dao.upsert(requestBody));
                 break;
 //            case "retrieve":
 //                standardisedResponse.setData(dao.retrieve(requestBody));

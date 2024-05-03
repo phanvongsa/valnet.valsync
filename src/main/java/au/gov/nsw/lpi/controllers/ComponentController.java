@@ -34,10 +34,10 @@ public class ComponentController extends BaseController{
         ComponentDao dao = (ComponentDao)this.iDao;
         switch(actionName.toLowerCase()){
             case "update":
-                standardisedResponse.setData(dao.COMPONENT_GET_JSON_DATA(requestBody));
+                standardisedResponse.setData(dao.upsert(requestBody));
                 break;
             case "retrieve":
-                standardisedResponse.setData(dao.COMPONENT_SEND_JSON_DATA(requestBody));
+                standardisedResponse.setData(dao.retrieve(requestBody));
                 break;
             default:
                 standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,"Invalid Request Action Call");

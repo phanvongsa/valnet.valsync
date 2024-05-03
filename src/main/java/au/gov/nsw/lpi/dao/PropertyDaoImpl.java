@@ -16,7 +16,7 @@ public class PropertyDaoImpl extends BaseDaoImp implements PropertyDao {
     }
 
     @Override
-    public String PROPERTY_GET_JSON_DATA(String payload) {
+    public String upsert(String payload) {
         String sql = String.format("{ ? = call %s.PROPERTY_GET_JSON_DATA(?) }",this.catalogName);
         logger.debug(sql);
         try (Connection connection = dataSource.getConnection()){

@@ -16,7 +16,7 @@ public class SuburbDaoImpl extends BaseDaoImp implements SuburbDao {
         super(dataSource);
     }
     @Override
-    public String STREET_UPSERT(String payload) {
+    public String street_upsert(String payload) {
         String sql = String.format("{ ? = call %s.PARSE_STREET_SUBURB_FROM_VALIQ(?) }",this.catalogName);
         try (Connection connection = dataSource.getConnection()){
             try (CallableStatement cs = connection.prepareCall(sql)) {
@@ -33,7 +33,7 @@ public class SuburbDaoImpl extends BaseDaoImp implements SuburbDao {
     }
 
     @Override
-    public String DISTRICT_UPSERT(String payload) {
+    public String district_upsert(String payload) {
         String sql = String.format("{ ? = call %s.PARSE_SUB_DIST_VALIQ(?) }",this.catalogName);
         try (Connection connection = dataSource.getConnection()){
             try (CallableStatement cs = connection.prepareCall(sql)) {

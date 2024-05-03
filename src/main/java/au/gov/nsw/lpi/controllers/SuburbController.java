@@ -36,10 +36,10 @@ public class SuburbController extends BaseController{
         SuburbDao dao = (SuburbDao)this.iDao;
         switch(entityAction){
             case "street/update":
-                standardisedResponse.setData(dao.STREET_UPSERT(requestBody));
+                standardisedResponse.setData(dao.street_upsert(requestBody));
                 break;
             case "district/update":
-                standardisedResponse.setData(dao.DISTRICT_UPSERT(requestBody));
+                standardisedResponse.setData(dao.district_upsert(requestBody));
                 break;
             default:
                 standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,"Invalid Request Action Call");
