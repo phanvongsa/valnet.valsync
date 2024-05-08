@@ -37,6 +37,28 @@ public class PegaServicesImpl implements PegaServices {
     @Override
     public Map<String, Object> property_related(String payload) {
         String api_url = String.format("%s/valsync/property/related", this.baseurl);
+        return sendRequests(api_url, payload);
+    }
+
+    @Override
+    public Map<String, Object> district_basedate(String payload) {
+        String api_url = String.format("%s/valsync/districtbasedate", this.baseurl);
+        return sendRequests(api_url, payload);
+    }
+
+    @Override
+    public Map<String, Object> supplementary_valuation(String payload) {
+        String api_url = String.format("%s/valsync/suppval", this.baseurl);
+        return sendRequests(api_url, payload);
+    }
+
+    @Override
+    public Map<String, Object> land_value(String payload) {
+        String api_url = String.format("%s/valsync/landvalue", this.baseurl);
+        return sendRequests(api_url, payload);
+    }
+
+    private Map<String, Object> sendRequests(String api_url, String payload){
         Map<String, Object> nfo = new HashMap<>();
         try {
             HttpPost req = new HttpPost(api_url);
@@ -47,7 +69,6 @@ public class PegaServicesImpl implements PegaServices {
         }
         return nfo;
     }
-
     private void setResponseMap(Map<String, Object> nfo, HttpResponse response){
         nfo.put("responseStatusCode",response.getStatusLine().getStatusCode());
         nfo.put("responseBody",getResponseBody(response));

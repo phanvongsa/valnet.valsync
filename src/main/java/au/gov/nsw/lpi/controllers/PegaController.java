@@ -41,11 +41,20 @@ public class PegaController extends BaseController {
             case "property/related":
                 setWithPegaResponse(standardisedResponse, pegaServices.property_related(requestBody));
                 break;
+            case "district/basedate":
+                setWithPegaResponse(standardisedResponse, pegaServices.district_basedate(requestBody));
+                break;
+            case "supplementary/valuation":
+                setWithPegaResponse(standardisedResponse, pegaServices.supplementary_valuation(requestBody));
+                break;
+            case "land/value":
+                setWithPegaResponse(standardisedResponse, pegaServices.land_value(requestBody));
+                break;
 //            case "retrieve":
 //                standardisedResponse.setData(dao.retrieve(requestBody));
 //                break;
             default:
-                standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,"Invalid Request Action Call");
+                standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,String.format("Invalid Request Action Call (%s)",entityAction));
                 break;
         }
 
@@ -57,7 +66,9 @@ public class PegaController extends BaseController {
         logger.debug(Utils.object2Json(pegaResponse));
         if((int)pegaResponse.get("responseStatusCode")==200)
             standardisedResponse.setData(pegaResponse.get("responseBody").toString());
-        else
-            standardisedResponse = new StandardisedResponse(HttpStatus.INTERNAL_SERVER_ERROR,pegaResponse.get("responseBody").toString());
+        else{
+            standardisedResponse.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            standardisedResponse.setData(pegaResponse.get("responseBody").toString());
+        }
     }
 }

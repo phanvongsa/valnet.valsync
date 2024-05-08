@@ -51,6 +51,10 @@ public class StandardisedResponse {
 
     }
 
+    public void setHttpStatus(HttpStatus httpStatus){
+        this.httpStatus = httpStatus;
+        initialiseCodeMessage();
+    }
     public void setData(Object data){
         if(data.toString().toLowerCase().contains("error")){
             this.httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
