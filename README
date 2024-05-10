@@ -147,26 +147,41 @@ v_rtn := COMPONENT_GET_JSON_DATA('{
 dbms_output.put_line('Return :' || v_rtn);
 end;
 
-=== valiq
+=== SYNC APIS ===
+VALIQ ==> VALNET
+    https://spadev.atlassian.net/wiki/spaces/VIAAD/pages/1839071277/Land+Value
+    property update             /valsync/property/update
 
---  SET SERVEROUTPUT ON
-DECLARE
-  v_connection UTL_TCP.connection;
-BEGIN
-  -- Replace 'hostname' and 'port' with the actual values you want to test
-  /*
-  v_connection := UTL_TCP.open_connection('localhost', 8092 => port_number);
+    https://spadev.atlassian.net/wiki/spaces/VIAAD/pages/1838972960/Supplementary+Valuation
+    supplementary valuation     /valsync/property/suppval/update
 
-  IF UTL_TCP.is_open(v_connection) THEN
-    DBMS_OUTPUT.put_line('Connection successful.');
-    UTL_TCP.close_connection(v_connection);
-  ELSE
-    DBMS_OUTPUT.put_line('Connection failed.');
-  END IF;
-  */
-  DBMS_OUTPUT.put_line('Connection failed.');
-EXCEPTION
-  WHEN OTHERS THEN
-    DBMS_OUTPUT.put_line('Error: ' || SQLERRM);
-END;
-/
+    https://spadev.atlassian.net/wiki/spaces/VIAAD/pages/2012545025/Suburb+Street
+    suburb street               /valsync/suburb/street/update
+
+    https://spadev.atlassian.net/wiki/spaces/VIAAD/pages/2012545042/Suburb+District
+    suburb district             /valsync/suburb/district/update
+
+    https://spadev.atlassian.net/wiki/spaces/VIAAD/pages/1839202358/Dealings
+    dealings                    /valsync/dealing/update
+
+    https://spadev.atlassian.net/wiki/spaces/VIAAD/pages/2002911233/Apportionment+Sync+up
+    apportionment sync up       /valsync/apportionment/update
+
+    https://spadev.atlassian.net/wiki/spaces/VIAAD/pages/1839104080/Component+Sync+up+R2
+    component sync up(R2)       TBD
+
+VALNET ==> VALIQ
+    https://spadev.atlassian.net/wiki/spaces/VIAAD/pages/1838972960/Supplementary+Valuation
+    supplementary valuation     /valsync/pega/supplementary/valuation
+
+    https://spadev.atlassian.net/wiki/spaces/VIAAD/pages/1839202384/Related+Property
+    related property            /valsync/pega/property/related
+
+    https://spadev.atlassian.net/wiki/spaces/VIAAD/pages/1839071277/Land+Value
+    land value                  /valsync/pega/property/landvalue
+
+    https://spadev.atlassian.net/wiki/spaces/VIAAD/pages/1999667204/District+Base+Date
+    district base date          /valsync/pega/district/basedate
+
+    https://spadev.atlassian.net/wiki/spaces/VIAAD/pages/1839104080/Component+Sync+up+R2
+    component sync up(R2)       TBD

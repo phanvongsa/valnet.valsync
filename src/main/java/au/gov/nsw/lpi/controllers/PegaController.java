@@ -44,9 +44,9 @@ public class PegaController extends BaseController {
             case "district/basedate":
                 setWithPegaResponse(standardisedResponse, pegaServices.district_basedate(requestBody));
                 break;
-//            case "supplementary/valuation":
-//                setWithPegaResponse(standardisedResponse, pegaServices.supplementary_valuation(requestBody));
-//                break;
+            case "supplementary/valuation":
+                setWithPegaResponse(standardisedResponse, pegaServices.supplementary_valuation(requestBody));
+                break;
             case "land/value":
                 setWithPegaResponse(standardisedResponse, pegaServices.land_value(requestBody));
                 break;

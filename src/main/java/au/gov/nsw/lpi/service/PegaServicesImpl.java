@@ -46,11 +46,11 @@ public class PegaServicesImpl implements PegaServices {
         return sendRequests(api_url, payload);
     }
 
-//    @Override
-//    public Map<String, Object> supplementary_valuation(String payload) {
-//        String api_url = String.format("%s/valsync/suppval", this.baseurl);
-//        return sendRequests(api_url, payload);
-//    }
+    @Override
+    public Map<String, Object> supplementary_valuation(String payload) {
+        String api_url = String.format("%s/valsync/suppval", this.baseurl);
+        return sendRequests(api_url, payload);
+    }
 
     @Override
     public Map<String, Object> land_value(String payload) {
