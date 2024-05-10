@@ -23,25 +23,31 @@ public class PropertyController extends BaseController{
         initialise(propertyDao, securityService);
     }
 
-
     @RequestMapping(value="/{actionName}", method = POST)
     public ResponseEntity<String> doPost(@PathVariable String actionName, @RequestBody String requestBody, HttpServletRequest request) {
+        return executeEntityAction(actionName, requestBody, request);
+    }
+    @RequestMapping(value="/{entityName}/{actionName}", method = POST)
+    public ResponseEntity<String> doPost(@PathVariable String entityName, @PathVariable String actionName, @RequestBody String requestBody, HttpServletRequest request) {
+        return executeEntityAction(entityName+"/"+actionName, requestBody, request);
+    }
 
+
+    public ResponseEntity<String> executeEntityAction(String entityAction, String requestBody, HttpServletRequest request) {
         StandardisedResponse standardisedResponse = securityValidationRequest(requestBody, request);
         if (standardisedResponse.code != StandardisedResponseCode.SUCCESS)
             return standardisedResponse.getResponseEntity();
 
-        //this.daoService.get
         PropertyDao dao = (PropertyDao)this.iDao;
-        switch(actionName.toLowerCase()){
+        switch(entityAction.toLowerCase()){
             case "update":
                 standardisedResponse.setData(dao.upsert(requestBody));
                 break;
-//            case "retrieve":
-//                standardisedResponse.setData(dao.retrieve(requestBody));
-//                break;
+            case "suppval/update":
+                standardisedResponse.setData(dao.upsert_supplementary_value(requestBody));
+                break;
             default:
-                standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,"Invalid Request Action Call");
+                standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,String.format("Invalid Request Action Call (%s)",entityAction));
                 break;
         }
 

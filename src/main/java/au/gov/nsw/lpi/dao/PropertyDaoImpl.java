@@ -32,4 +32,9 @@ public class PropertyDaoImpl extends BaseDaoImp implements PropertyDao {
             return getExceptionResponse(e);
         }
     }
+
+    @Override
+    public String upsert_supplementary_value(String payload) {
+        return "TO BE IMPLEMENTED IN DB FUNCTION";
+    }
 }
