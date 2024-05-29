@@ -34,7 +34,7 @@ public class SuburbDaoImpl extends BaseDaoImp implements SuburbDao {
 
     @Override
     public String district_upsert(String payload) {
-        String sql = String.format("{ ? = call %s.PARSE_SUB_DIST_VALIQ(?) }",this.catalogName);
+        String sql = String.format("{ ? = call %s.PARSE_SUB_DIST_FROM_VALIQ(?) }",this.catalogName);
         try (Connection connection = dataSource.getConnection()){
             try (CallableStatement cs = connection.prepareCall(sql)) {
                 Clob clob = connection.createClob();
