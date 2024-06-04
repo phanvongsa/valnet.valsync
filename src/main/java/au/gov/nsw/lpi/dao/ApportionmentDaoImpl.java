@@ -3,6 +3,10 @@ package au.gov.nsw.lpi.dao;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+import java.sql.CallableStatement;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.Types;
 
 @Component
 public class ApportionmentDaoImpl extends BaseDaoImp implements ApportionmentDao{
@@ -13,9 +17,8 @@ public class ApportionmentDaoImpl extends BaseDaoImp implements ApportionmentDao
 
     @Override
     public String upsert(String payload) {
-        String sql = String.format("{ ? = call %s.APPORTIONMENT DAO TO BE IMPLEMENETED(?) }",this.catalogName);
+        String sql = String.format("{ ? = call %s.APPORTIONMENT_GET_JSON_DATA(?) }",this.catalogName);
         logger.debug(sql);
-        /*
         try (Connection connection = dataSource.getConnection()){
             try (CallableStatement cs = connection.prepareCall(sql)) {
                 Clob clob = connection.createClob();
@@ -28,7 +31,5 @@ public class ApportionmentDaoImpl extends BaseDaoImp implements ApportionmentDao
         }catch (Exception e){
             return getExceptionResponse(e);
         }
-        */
-        return "APPORTIONMENTDAO TO BE IMPLEMENTED IN DB FUNCTION";
     }
 }

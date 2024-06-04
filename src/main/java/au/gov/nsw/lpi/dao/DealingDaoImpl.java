@@ -15,9 +15,8 @@ public class DealingDaoImpl extends BaseDaoImp implements DealingDao {
     }
     @Override
     public String upsert(String payload) {
-        String sql = String.format("{ ? = call %s.DELAING DAO TO BE IMPLEMENETED(?) }",this.catalogName);
+        String sql = String.format("{ ? = call %s.PARSE_DEALING_FROM_VALIQ(?) }",this.catalogName);
         logger.debug(sql);
-        /*
         try (Connection connection = dataSource.getConnection()){
             try (CallableStatement cs = connection.prepareCall(sql)) {
                 Clob clob = connection.createClob();
@@ -30,7 +29,5 @@ public class DealingDaoImpl extends BaseDaoImp implements DealingDao {
         }catch (Exception e){
             return getExceptionResponse(e);
         }
-        */
-        return "DEALINGSDAO TO BE IMPLEMENTED IN DB FUNCTION";
     }
 }
