@@ -40,6 +40,7 @@ END;
 commit;
 
 //+++ CREATE/REPLACE PACKAGE +++//
+
 CREATE OR REPLACE PACKAGE VN_PEGA_INTEGRATION_API AS
   -- Declare your package-level variables, types, and constants here (if any)
 
@@ -47,10 +48,11 @@ CREATE OR REPLACE PACKAGE VN_PEGA_INTEGRATION_API AS
   FUNCTION COMPONENT_GET_JSON_DATA(p1 Clob) RETURN varchar;
   FUNCTION COMPONENT_SEND_JSON_DATA(p1 Int, p2 VARCHAR) RETURN Clob;
   FUNCTION PROPERTY_GET_JSON_DATA(p1 Clob) RETURN varchar;
-  FUNCTION PARSE_SUB_DIST_VALIQ(p1 Clob) RETURN Clob;
-  FUNCTION PARSE_STREET_SUBURB_FROM_VALIQ(p1 Clob) RETURN Clob;
+  FUNCTION SUBURB_DISTRICT_GET_JSON_DATA(p1 Clob) RETURN Clob;
+  FUNCTION SUBURB_STREET_GET_JSON_DATA(p1 Clob) RETURN Clob;
   FUNCTION APPORTIONMENT_GET_JSON_DATA(p1 Clob) RETURN Clob;
-  FUNCTION PARSE_DEALING_FROM_VALIQ(p1 Clob) RETURN Clob;
+  FUNCTION DEALING_GET_JSON_DATA(p1 Clob) RETURN Clob;
+  FUNCTION SUPPLEMENTRY_VAL_GET_JSON_DATA(p1 Clob) RETURN Clob;
   -- Declare other package elements as needed
 END VN_PEGA_INTEGRATION_API;
 /
@@ -92,29 +94,29 @@ CREATE OR REPLACE PACKAGE BODY VN_PEGA_INTEGRATION_API AS
     RETURN '{"comp_id":100,"comp_code":"","comp_desc":"","district_code":"","zone_code":""}';
   END COMPONENT_SEND_JSON_DATA;
 
-  FUNCTION PARSE_SUB_DIST_VALIQ(p1 Clob) RETURN Clob IS
+  FUNCTION SUBURB_DISTRICT_GET_JSON_DATA(p1 Clob) RETURN Clob IS
     -- Function logic goes here
     -- You can use PL/SQL statements, variables, and other constructs
     pragma autonomous_transaction;
   BEGIN
     -- Your implementation code
-    flog('FUNCTION CALL','parse_sub_dist_valiq',p1);
+    flog('FUNCTION CALL','SUBURB_DISTRICT_GET_JSON_DATA',p1);
     COMMIT;
     RETURN 'SUCCESS';
-  END PARSE_SUB_DIST_VALIQ;
+  END SUBURB_DISTRICT_GET_JSON_DATA;
 
-  FUNCTION PARSE_STREET_SUBURB_FROM_VALIQ(p1 Clob) RETURN Clob IS
+  FUNCTION SUBURB_STREET_GET_JSON_DATA(p1 Clob) RETURN Clob IS
       -- Function logic goes here
       -- You can use PL/SQL statements, variables, and other constructs
       pragma autonomous_transaction;
     BEGIN
       -- Your implementation code
-      flog('FUNCTION CALL','parse_street_suburb_from_valiq',p1);
+      flog('FUNCTION CALL','SUBURB_STREET_GET_JSON_DATA',p1);
       COMMIT;
       RETURN 'SUCCESS';
-    END PARSE_STREET_SUBURB_FROM_VALIQ;
+    END SUBURB_STREET_GET_JSON_DATA;
 
-  FUNCTION APPORTIONMENT_GET_JSON_DATA(p1 Clob) RETURN Clob IS
+    FUNCTION APPORTIONMENT_GET_JSON_DATA(p1 Clob) RETURN Clob IS
         -- Function logic goes here
         -- You can use PL/SQL statements, variables, and other constructs
         pragma autonomous_transaction;
@@ -125,21 +127,32 @@ CREATE OR REPLACE PACKAGE BODY VN_PEGA_INTEGRATION_API AS
         RETURN 'SUCCESS';
       END APPORTIONMENT_GET_JSON_DATA;
 
-    FUNCTION PARSE_DEALING_FROM_VALIQ(p1 Clob) RETURN Clob IS
+    FUNCTION DEALING_GET_JSON_DATA(p1 Clob) RETURN Clob IS
         -- Function logic goes here
         -- You can use PL/SQL statements, variables, and other constructs
         pragma autonomous_transaction;
       BEGIN
         -- Your implementation code
-        flog('FUNCTION CALL','parse_dealing_from_valiq',p1);
+        flog('FUNCTION CALL','DEALING_GET_JSON_DATA',p1);
         COMMIT;
         RETURN 'SUCCESS';
-      END PARSE_DEALING_FROM_VALIQ;
+      END DEALING_GET_JSON_DATA;
+
+    FUNCTION SUPPLEMENTRY_VAL_GET_JSON_DATA(p1 Clob) RETURN Clob IS
+        -- Function logic goes here
+        -- You can use PL/SQL statements, variables, and other constructs
+        pragma autonomous_transaction;
+      BEGIN
+        -- Your implementation code
+        flog('FUNCTION CALL','SUPPLEMENTRY_VAL_GET_JSON_DATA',p1);
+        COMMIT;
+        RETURN 'SUCCESS';
+      END SUPPLEMENTRY_VAL_GET_JSON_DATA;
+
 
     -- Implement other package elements as needed
 END VN_PEGA_INTEGRATION_API;
 /
-
 
 //+++ CREATE/REPLACE PACKAGE +++//
 

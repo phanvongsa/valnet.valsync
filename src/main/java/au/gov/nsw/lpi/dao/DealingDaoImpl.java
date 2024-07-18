@@ -15,7 +15,7 @@ public class DealingDaoImpl extends BaseDaoImp implements DealingDao {
     }
     @Override
     public String upsert(String payload) {
-        String sql = String.format("{ ? = call %s.PARSE_DEALING_FROM_VALIQ(?) }",this.catalogName);
+        String sql = String.format("{ ? = call %s.DEALING_GET_JSON_DATA(?) }",this.catalogName);
         logger.debug(sql);
         try (Connection connection = dataSource.getConnection()){
             try (CallableStatement cs = connection.prepareCall(sql)) {

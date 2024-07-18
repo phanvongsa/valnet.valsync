@@ -18,7 +18,6 @@ public class PropertyDaoImpl extends BaseDaoImp implements PropertyDao {
     @Override
     public String upsert(String payload) {
         String sql = String.format("{ ? = call %s.PROPERTY_GET_JSON_DATA(?) }",this.catalogName);
-        logger.debug(sql);
         try (Connection connection = dataSource.getConnection()){
             try (CallableStatement cs = connection.prepareCall(sql)) {
                 Clob clob = connection.createClob();
@@ -35,6 +34,18 @@ public class PropertyDaoImpl extends BaseDaoImp implements PropertyDao {
 
     @Override
     public String upsert_supplementary_value(String payload) {
-        return "TO BE IMPLEMENTED IN DB FUNCTION";
+        String sql = String.format("{ ? = call %s.SUPPLEMENTRY_VAL_GET_JSON_DATA(?) }",this.catalogName);
+        try (Connection connection = dataSource.getConnection()){
+            try (CallableStatement cs = connection.prepareCall(sql)) {
+                Clob clob = connection.createClob();
+                clob.setString(1, payload);
+                cs.setClob(2, clob);
+                cs.registerOutParameter(1, Types.VARCHAR);
+                cs.execute();
+                return cs.getString(1);
+            }
+        }catch (Exception e){
+            return getExceptionResponse(e);
+        }
     }
 }
