@@ -3,6 +3,11 @@ package au.gov.nsw.lpi.dao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.CallableStatement;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.Types;
+
 import javax.sql.DataSource;
 
 public abstract class BaseDaoImp implements BaseDao {
@@ -19,4 +24,19 @@ public abstract class BaseDaoImp implements BaseDao {
         return e.getMessage()==null?"Error EXCEPTION":e.getMessage();
     }
 
+    protected String runStandardProcedure(String procedure_name, String payload){
+      String sql = String.format("{ ? = call %s.%s(?) }",this.catalogName, procedure_name);
+      try (Connection connection = dataSource.getConnection()){
+          try (CallableStatement cs = connection.prepareCall(sql)) {
+              Clob clob = connection.createClob();
+              clob.setString(1, payload);
+              cs.setClob(2, clob);
+              cs.registerOutParameter(1, Types.VARCHAR);
+              cs.execute();
+              return cs.getString(1);
+          }
+      }catch (Exception e){
+          return getExceptionResponse(e);
+      }
+    }
 }

@@ -41,14 +41,20 @@ public class PropertyController extends BaseController{
         PropertyDao dao = (PropertyDao)this.iDao;
         switch(entityAction.toLowerCase()){
             case "update":
-                standardisedResponse.setData(dao.upsert(requestBody));
-                break;
+              standardisedResponse.setData(dao.upsert(requestBody));
+              break;
             case "suppval/update":
-                standardisedResponse.setData(dao.upsert_supplementary_value(requestBody));
-                break;
+              standardisedResponse.setData(dao.upsert_supplementary_value(requestBody));
+              break;
+            case "suppval/cancel":
+              standardisedResponse.setData(dao.cancel_supplementary_value(requestBody));
+              break;
+            case "suppval/remove":
+              standardisedResponse.setData(dao.remove_supplementary_value(requestBody));
+              break;                              
             default:
-                standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,String.format("Invalid Request Action Call (%s)",entityAction));
-                break;
+              standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,String.format("Invalid Request Action Call (%s)",entityAction));
+              break;
         }
 
         return standardisedResponse.getResponseEntity();

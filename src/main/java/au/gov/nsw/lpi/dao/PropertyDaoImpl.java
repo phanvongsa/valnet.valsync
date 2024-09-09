@@ -48,4 +48,15 @@ public class PropertyDaoImpl extends BaseDaoImp implements PropertyDao {
             return getExceptionResponse(e);
         }
     }
+
+    @Override
+    public String cancel_supplementary_value(String payload) {
+      return runStandardProcedure("CANCEL_SUPP_VAL_GET_JSON_DATA",payload);
+    }
+
+    @Override
+    public String remove_supplementary_value(String payload) {
+      return runStandardProcedure("REMOVE_PROPERTY_GET_JSON_DATA",payload);      
+    }
+    
 }
