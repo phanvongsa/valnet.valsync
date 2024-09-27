@@ -59,7 +59,10 @@ public class YugController{
             nfo.put("Data Source", testDataSources());
             nfo.put("Remote Address", Utils.getRequestRemoteAddress(request));
             nfo.put("Allow Access", this.securityService.isRequestValid(request) ? "Yes" : "No");
-            nfo.put("Pega API BaseUrl", this.pegaConfig.baseurl);
+            nfo.put("Pega API Base", this.pegaConfig.api_base);
+            nfo.put("Pega API DataSync", this.pegaConfig.datasync_api);
+            nfo.put("Pega API Attachments", this.pegaConfig.attachments_api);
+            nfo.put("Pega API Cases", this.pegaConfig.cases_api);
 
             standardisedResponse = new StandardisedResponse(HttpStatus.OK, nfo);
         }

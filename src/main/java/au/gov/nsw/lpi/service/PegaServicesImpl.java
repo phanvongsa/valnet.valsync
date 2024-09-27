@@ -28,9 +28,9 @@ public class PegaServicesImpl implements PegaServices {
     private final HttpClient httpClient;;
 
     public PegaServicesImpl(PegaConfig cfg){
-        this.baseurl = cfg.baseurl;
+        this.baseurl = cfg.datasync_api;
         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(cfg.username, cfg.password));
+        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(cfg.datasync_un, cfg.datasync_pw));
         this.httpClient = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
     }
 

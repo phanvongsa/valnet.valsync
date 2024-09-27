@@ -1,51 +1,25 @@
 package au.gov.nsw.lpi.dao;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
-import java.sql.CallableStatement;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.Types;
 
 @Component
 public class SuburbDaoImpl extends BaseDaoImp implements SuburbDao {
-    public SuburbDaoImpl(DataSource dataSource) {
-        super(dataSource);
-    }
-    @Override
-    public String street_upsert(String payload) {
-        String sql = String.format("{ ? = call %s.SUBURB_STREET_GET_JSON_DATA(?) }",this.catalogName);
-        try (Connection connection = dataSource.getConnection()){
-            try (CallableStatement cs = connection.prepareCall(sql)) {
-                Clob clob = connection.createClob();
-                clob.setString(1, payload);
-                cs.setClob(2, clob);
-                cs.registerOutParameter(1, Types.CLOB);
-                cs.execute();
-                return cs.getString(1);
-            }
-        }catch (Exception e){
-            return getExceptionResponse(e);
-        }
-    }
+  
+  private String street_upsert_procedurename = "SUBURB_STREET_GET_JSON_DATA";
+  private String district_upsert_procedurename = "SUBURB_DISTRICT_GET_JSON_DATA";
 
-    @Override
-    public String district_upsert(String payload) {
-        String sql = String.format("{ ? = call %s.SUBURB_DISTRICT_GET_JSON_DATA(?) }",this.catalogName);
-        try (Connection connection = dataSource.getConnection()){
-            try (CallableStatement cs = connection.prepareCall(sql)) {
-                Clob clob = connection.createClob();
-                clob.setString(1, payload);
-                cs.setClob(2, clob);
-                cs.registerOutParameter(1, Types.CLOB);
-                cs.execute();
-                return cs.getString(1);
-            }
-        }catch (Exception e){
-            return getExceptionResponse(e);
-        }
-    }
+  public SuburbDaoImpl(DataSource dataSource) {
+    super(dataSource);
+  }
+  @Override
+  public String street_upsert(String payload) {
+    return runStandardProcedure(this.street_upsert_procedurename,payload);      
+  }
+
+  @Override
+  public String district_upsert(String payload) {
+    return runStandardProcedure(this.district_upsert_procedurename,payload);            
+  }
 }

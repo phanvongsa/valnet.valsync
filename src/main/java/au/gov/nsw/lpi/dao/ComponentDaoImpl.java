@@ -13,32 +13,20 @@ import java.sql.Types;
 @Component
 public class ComponentDaoImpl extends BaseDaoImp implements ComponentDao {
 
+    private String upsert_procedurename = "COMPONENT_GET_JSON_DATA";
+
     public ComponentDaoImpl(DataSource dataSource) {
         super(dataSource);
     }
 
     @Override
     public String upsert(String payload){
-        String sql = String.format("{ ? = call %s.COMPONENT_GET_JSON_DATA(?) }",this.catalogName);
-//        logger.debug(sql);
-        try (Connection connection = dataSource.getConnection()){
-            try (CallableStatement cs = connection.prepareCall(sql)) {
-                Clob clob = connection.createClob();
-                clob.setString(1, payload);
-                cs.setClob(2, clob);
-                cs.registerOutParameter(1, Types.VARCHAR);
-                cs.execute();
-                return cs.getString(1);
-            }
-        }catch (Exception e){
-            return getExceptionResponse(e);
-        }
+      return runStandardProcedure(this.upsert_procedurename,payload);
     }
 
     @Override
     public String retrieve(String payload){
         String sql = String.format("{ ? = call %s.COMPONENT_SEND_JSON_DATA(?, ?)}", this.catalogName);
-//        logger.debug(sql);
         try (Connection connection = dataSource.getConnection()){
             try (CallableStatement cs = connection.prepareCall(sql)) {
                 JsonObject jo = JsonParser.parseString(payload).getAsJsonObject();

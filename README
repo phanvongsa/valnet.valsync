@@ -68,7 +68,7 @@ CREATE OR REPLACE PACKAGE BODY VN_PEGA_INTEGRATION_API AS
 	pragma autonomous_transaction;
   BEGIN
     -- Your implementation code
-    flog('FUNCTION CALL','component_get_json_data',p1);
+    flog('FUNCTION CALL','COMPONENT_GET_JSON_DATA',p1);
     COMMIT;
     RETURN 'SUCCESS';
   END COMPONENT_GET_JSON_DATA;
@@ -80,7 +80,7 @@ CREATE OR REPLACE PACKAGE BODY VN_PEGA_INTEGRATION_API AS
 	pragma autonomous_transaction;
   BEGIN
     -- Your implementation code
-    flog('FUNCTION CALL','property_get_json_data',p1);
+    flog('FUNCTION CALL','PROPERTY_GET_JSON_DATA',p1);
     COMMIT;
     RETURN 'SUCCESS';
   END PROPERTY_GET_JSON_DATA;
@@ -91,7 +91,7 @@ CREATE OR REPLACE PACKAGE BODY VN_PEGA_INTEGRATION_API AS
 	pragma autonomous_transaction;
   BEGIN
     -- Your implementation code
-    flog('FUNCTION CALL','component_send_json_data',to_char(p1,'99999')||':'||p2);
+    flog('FUNCTION CALL','COMPONENT_SEND_JSON_DATA',to_char(p1,'99999')||':'||p2);
     COMMIT;
     RETURN '{"comp_id":100,"comp_code":"","comp_desc":"","district_code":"","zone_code":""}';
   END COMPONENT_SEND_JSON_DATA;
@@ -124,7 +124,7 @@ CREATE OR REPLACE PACKAGE BODY VN_PEGA_INTEGRATION_API AS
         pragma autonomous_transaction;
       BEGIN
         -- Your implementation code
-        flog('FUNCTION CALL','apportionment_get_json_data',p1);
+        flog('FUNCTION CALL','APPORTIONMENT_GET_JSON_DATA',p1);
         COMMIT;
         RETURN 'SUCCESS';
       END APPORTIONMENT_GET_JSON_DATA;
