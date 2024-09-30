@@ -7,8 +7,8 @@ import javax.sql.DataSource;
 @Component
 public class SuburbDaoImpl extends BaseDaoImp implements SuburbDao {
   
-  private String street_upsert_procedurename = "SUBURB_STREET_GET_JSON_DATA";
-  private String district_upsert_procedurename = "SUBURB_DISTRICT_GET_JSON_DATA";
+  private final String street_upsert_procedurename = "SUBURB_STREET_GET_JSON_DATA";
+  private final String district_upsert_procedurename = "SUBURB_DISTRICT_GET_JSON_DATA";
 
   public SuburbDaoImpl(DataSource dataSource) {
     super(dataSource);

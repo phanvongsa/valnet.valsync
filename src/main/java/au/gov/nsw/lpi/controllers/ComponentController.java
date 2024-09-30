@@ -42,7 +42,6 @@ public class ComponentController extends BaseController{
             default:
                 standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,"Invalid Request Action Call");
                 break;
-
         }
 
         return standardisedResponse.getResponseEntity();

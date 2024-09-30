@@ -7,7 +7,7 @@ import javax.sql.DataSource;
 @Component
 public class DealingDaoImpl extends BaseDaoImp implements DealingDao {
     
-  private String upsert_procedurename = "DEALING_GET_JSON_DATA";
+  private final String upsert_procedurename = "DEALING_GET_JSON_DATA";
   public DealingDaoImpl(DataSource dataSource) {
         super(dataSource);
   }

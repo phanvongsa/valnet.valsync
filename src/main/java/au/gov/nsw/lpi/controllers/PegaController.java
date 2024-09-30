@@ -50,9 +50,9 @@ public class PegaController extends BaseController {
             case "land/value":
                 setWithPegaResponse(standardisedResponse, pegaServices.land_value(requestBody));
                 break;
-//            case "retrieve":
-//                standardisedResponse.setData(dao.retrieve(requestBody));
-//                break;
+            case "attachments/associate":
+                setWithPegaResponse(standardisedResponse, pegaServices.attachments_associate(requestBody));
+                break;
             default:
                 standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,String.format("Invalid Request Action Call (%s)",entityAction));
                 break;

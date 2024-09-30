@@ -1,16 +1,13 @@
 package au.gov.nsw.lpi.common;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-import org.springframework.http.HttpHeaders;
+import com.google.gson.*;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.google.gson.Gson;
-
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Utils {
     public static ResponseEntity<String> getAsResponseEntity(Object o) {
@@ -39,6 +36,10 @@ public class Utils {
         return gson.fromJson(jsonString,Object.class);
     }
 
+    public static JsonObject json2JsonObject(String jsonString){
+        return JsonParser.parseString(jsonString).getAsJsonObject();
+    }
+
     public static String object2Json(Object object){
         Gson gson = new Gson();
         return gson.toJson(object);
@@ -64,5 +65,12 @@ public class Utils {
         }
         return false; // String not found
     }
+    // check if file exists based on the passed in filepath string
+    public static boolean fileExists(String file_path) {
+        return Paths.get(file_path).toFile().exists();
+    }
 
+    public static File getFileIfExists(String file_path) {
+        return fileExists(file_path)? Paths.get(file_path).toFile():null;
+    }
 }
