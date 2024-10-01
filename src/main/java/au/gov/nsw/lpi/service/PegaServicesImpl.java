@@ -20,11 +20,14 @@ import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.ContentType;
+import org.apache.http.HttpEntity;
 @Service
 public class PegaServicesImpl implements PegaServices {
     protected static final Logger logger = LoggerFactory.getLogger(PegaServices.class);
@@ -39,7 +42,7 @@ public class PegaServicesImpl implements PegaServices {
     private final String endpoint_supplementary_valuation = "/valsync/suppval";
     private final String endpoint_land_value = "/valsync/landvalue";
 
-    private final String endpoint_attachments_upload = "/attachments/upload";
+    private final String endpoint_attachments_upload = "/upload";
 
     public PegaServicesImpl(PegaConfig cfg){
         this.dataSync_api = cfg.datasync_api;
@@ -76,43 +79,53 @@ public class PegaServicesImpl implements PegaServices {
     @Override
     public Map<String, Object> attachments_associate(String payload) {
         String api_url = this.attachments_api+this.endpoint_attachments_upload;
-        Object ejo = Utils.json2JsonObject(payload).getAsJsonObject("entity");
-        Utils.json2JsonObject(payload).getAsJsonArray("attachments").forEach(attachment -> {
+//        Object ejo = Utils.json2JsonObject(payload).getAsJsonObject("entity");
+
+        Map<String, Object> nfo = new HashMap<>();
+        ArrayList<Map<String, String>> attachments = new ArrayList<>();
+        // upload attachments
+        StringBuilder uploadErrorMessage = new StringBuilder();
+        JsonArray ajo = Utils.json2JsonObject(payload).getAsJsonArray("attachments");
+        for(int i=0;i<ajo.size();i++){
+            JsonObject attachment = ajo.get(i).getAsJsonObject();
+            Map<String, String> uploaded_attachment = new HashMap<>();
+            uploaded_attachment.put("type","File");
+            uploaded_attachment.put("category","File");
+            uploaded_attachment.put("name",attachment.getAsJsonObject().get("name").getAsString());
+
+            Map<String, Object> upload_response = new HashMap<>();
             String file_path = attachment.getAsJsonObject().get("file").getAsString();
-//            String file_title = attachment.getAsJsonObject().get("title").getAsString();
             File file = Utils.getFileIfExists(file_path);
             if(file!=null){
                 HttpPost req = new HttpPost(api_url);
+                MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+                builder.addBinaryBody("content", file, ContentType.APPLICATION_OCTET_STREAM, file.getName());
+                HttpEntity multipart = builder.build();
+                req.setEntity(multipart);
+                try {
+                    setResponseMap(upload_response, this.attachmentsHttpClient.execute(req));
+                } catch (Exception ex) {
+                    setResponseMap(upload_response, ex);
+                }
+                if(upload_response.get("responseStatusCode").equals(201)){
+                    uploaded_attachment.put("ID",Utils.json2JsonObject(upload_response.get("responseBody").toString()).get("ID").getAsString());
+                    attachments.add(uploaded_attachment);
+                }
             }else{
-                logger.error(file_path+" file does not exist");
+                uploadErrorMessage.append(String.format("Attachment %d: Invalid File %s\n",i+1,file_path));
             }
-        });
+        }
 
-//        Utils.json2JsonObject(payload).getAsJsonArray("attachments").forEach(attachment -> {
-//            JsonObject ajo = attachment.getAsJsonObject();
-//            logger.debug(attachment.getAsString());
-//        });
-            //ajo.addProperty("entityId", ejo.get("entityId").getAsString());
-            //ajo.addProperty("entityType", ejo.get("entityType").getAsString());
+        // associate to case
+        if(uploadErrorMessage.length() == 0) {
+            System.out.println(Utils.object2Json(attachments));
+            // to do: associate attachments to case
 
-//        Utils.json2JsonObject(payload).getAsJsonObject("attachments").getAsJsonArray("attachment").forEach(attachment -> {
-//            //JsonObject ajo = attachment.getAsJsonObject();
-//            logger.debug(attachment.getAsString());
-////            ajo.addProperty("entityId", ejo.get("entityId").getAsString());
-////            ajo.addProperty("entityType", ejo.get("entityType").getAsString());
-//        });
-//        logger.debug("attachments_associate");
-//        logger.debug(api_url);
-//        logger.debug(ejo.toString());
-
-        Map<String, Object> nfo = new HashMap<>();
-        try {
-            //HttpPost req = new HttpPost(api_url);
             nfo.put("responseStatusCode",200);
-            nfo.put("responseBody",payload);
-            //System.out.println("attachments_associate");
-        }catch (Exception ex){
-            setResponseMap(nfo, ex);
+            nfo.put("responseBody", "SUCCESS");
+        }else{
+            nfo.put("responseStatusCode",500);
+            nfo.put("responseBody", uploadErrorMessage.toString());
         }
         return nfo;
     }
