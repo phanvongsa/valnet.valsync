@@ -15,4 +15,6 @@ public interface PegaServices {
     Map<String, Object> land_value(String payload);
 
     Map<String, Object> attachments_associate(String payload);
+
+
 }

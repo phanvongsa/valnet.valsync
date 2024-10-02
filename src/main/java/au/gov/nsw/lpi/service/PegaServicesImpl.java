@@ -34,8 +34,10 @@ public class PegaServicesImpl implements PegaServices {
 
     private final String dataSync_api;
     private final String attachments_api;
+
+    private final String cases_api;
     private final HttpClient dataSyncHttpClient;
-    private final HttpClient attachmentsHttpClient;
+    private final HttpClient apiBaseHttpClient;
 
     private final String endpoint_property_related = "/valsync/property/related";
     private final String endpoint_district_basedate = "/valsync/districtbasedate";
@@ -43,6 +45,8 @@ public class PegaServicesImpl implements PegaServices {
     private final String endpoint_land_value = "/valsync/landvalue";
 
     private final String endpoint_attachments_upload = "/upload";
+    private final String endpoint_cases_attachments = "/{entityID}/attachments";
+
 
     public PegaServicesImpl(PegaConfig cfg){
         this.dataSync_api = cfg.datasync_api;
@@ -53,7 +57,9 @@ public class PegaServicesImpl implements PegaServices {
         this.attachments_api = cfg.attachments_api;
         CredentialsProvider attachmentsCredentialsProvider = new BasicCredentialsProvider();
         attachmentsCredentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(cfg.datasync_un, cfg.datasync_pw));
-        this.attachmentsHttpClient = HttpClients.custom().setDefaultCredentialsProvider(attachmentsCredentialsProvider).build();
+        this.apiBaseHttpClient = HttpClients.custom().setDefaultCredentialsProvider(attachmentsCredentialsProvider).build();
+
+        this.cases_api = cfg.cases_api;
     }
 
     @Override
@@ -78,69 +84,41 @@ public class PegaServicesImpl implements PegaServices {
 
     @Override
     public Map<String, Object> attachments_associate(String payload) {
-        String api_url = this.attachments_api+this.endpoint_attachments_upload;
-//        Object ejo = Utils.json2JsonObject(payload).getAsJsonObject("entity");
-
-        Map<String, Object> nfo = new HashMap<>();
-        ArrayList<Map<String, String>> attachments = new ArrayList<>();
-        // upload attachments
-        StringBuilder uploadErrorMessage = new StringBuilder();
+        // 0. upload attachments and get ids
         JsonArray ajo = Utils.json2JsonObject(payload).getAsJsonArray("attachments");
-        for(int i=0;i<ajo.size();i++){
-            JsonObject attachment = ajo.get(i).getAsJsonObject();
-            Map<String, String> uploaded_attachment = new HashMap<>();
-            uploaded_attachment.put("type","File");
-            uploaded_attachment.put("category","File");
-            uploaded_attachment.put("name",attachment.getAsJsonObject().get("name").getAsString());
-
-            Map<String, Object> upload_response = new HashMap<>();
-            String file_path = attachment.getAsJsonObject().get("file").getAsString();
-            File file = Utils.getFileIfExists(file_path);
-            if(file!=null){
-                HttpPost req = new HttpPost(api_url);
-                MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-                builder.addBinaryBody("content", file, ContentType.APPLICATION_OCTET_STREAM, file.getName());
-                HttpEntity multipart = builder.build();
-                req.setEntity(multipart);
-                try {
-                    setResponseMap(upload_response, this.attachmentsHttpClient.execute(req));
-                } catch (Exception ex) {
-                    setResponseMap(upload_response, ex);
-                }
-                if(upload_response.get("responseStatusCode").equals(201)){
-                    uploaded_attachment.put("ID",Utils.json2JsonObject(upload_response.get("responseBody").toString()).get("ID").getAsString());
-                    attachments.add(uploaded_attachment);
-                }
-            }else{
-                uploadErrorMessage.append(String.format("Attachment %d: Invalid File %s\n",i+1,file_path));
-            }
+        Map<String, Object> upload_response = upload_attachments(ajo);
+        logger.debug(Utils.object2Json(upload_response));
+        Map<String, Object> nfo = new HashMap<>();
+        nfo.put("responseStatusCode",upload_response.get("responseStatusCode"));
+        nfo.put("responseBody", "");
+        if(!upload_response.get("responseStatusCode").equals(200)) {
+            nfo.put("responseBody", upload_response.get("responseBody"));
+            return nfo;
         }
 
-        // associate to case
-        if(uploadErrorMessage.length() == 0) {
-            System.out.println(Utils.object2Json(attachments));
-            // to do: associate attachments to case
+        ArrayList<Map<String, String>> attachments = (ArrayList<Map<String, String>>)upload_response.get("data");
+        // 1. associate attachments to entity
+        JsonObject ejo = Utils.json2JsonObject(payload).getAsJsonObject("entity");
+        String entity_type = ejo.get("type").getAsString().toUpperCase();
+        String entity_id = ejo.get("id").getAsString();
 
-            nfo.put("responseStatusCode",200);
-            nfo.put("responseBody", "SUCCESS");
-        }else{
-            nfo.put("responseStatusCode",500);
-            nfo.put("responseBody", uploadErrorMessage.toString());
+        String api_end_point = "";
+        Map<String,Object> entity_payload = new HashMap<>();
+        entity_payload.put("attachments",attachments);
+
+        if (entity_type.equals("CASE")) {
+            api_end_point = this.cases_api + endpoint_cases_attachments.replace("{entityID}", entity_id);
+            nfo = sendRequest(apiBaseHttpClient, api_end_point, Utils.object2Json(entity_payload));
+        } else {
+            nfo.put("responseStatusCode", 500);
+            nfo.put("responseBody", "Invalid Entity Type");
         }
+
         return nfo;
     }
 
     private Map<String, Object> sendRequests(String api_end_point, String payload){
         return sendRequest(dataSyncHttpClient, this.dataSync_api+api_end_point, payload);
-//        switch (api_end_point){
-//            case endpoint_property_related:
-//            case endpoint_district_basedate:
-//            case endpoint_supplementary_valuation:
-//            case endpoint_land_value:
-//                return sendRequest(dataSyncHttpClient, this.dataSync_api+api_end_point, payload);
-//            default:
-//                return sendRequest(attachmentsHttpClient, this.attachments_api+api_end_point, payload);
-//        }
     }
 
     private Map<String, Object> sendRequest(HttpClient client, String api_url, String payload){
@@ -180,6 +158,48 @@ public class PegaServicesImpl implements PegaServices {
         }
     }
 
+    private Map<String, Object> upload_attachments(JsonArray ajo){
+        ArrayList<Map<String, String>> attachments = new ArrayList<>();
+        StringBuilder upload_errorMessage = new StringBuilder();
+        String upload_attachments_api = this.attachments_api+this.endpoint_attachments_upload;
+        for(int i=0;i<ajo.size();i++){
+            JsonObject attachment = ajo.get(i).getAsJsonObject();
+            String file_path = attachment.getAsJsonObject().get("file").getAsString();
+            File file = Utils.getFileIfExists(file_path);
+            Map<String, Object> upload_response = new HashMap<>();
+            if(file!=null){
+                Map<String, String> uploaded_attachment = new HashMap<>();
+                uploaded_attachment.put("type","File");
+                uploaded_attachment.put("category","File");
+                uploaded_attachment.put("name",attachment.getAsJsonObject().get("name").getAsString());
+                HttpPost req = new HttpPost(upload_attachments_api);
+                MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+                builder.addBinaryBody("content", file, ContentType.APPLICATION_OCTET_STREAM, file.getName());
+                HttpEntity multipart = builder.build();
+                req.setEntity(multipart);
+                try {
+                    setResponseMap(upload_response, this.apiBaseHttpClient.execute(req));
+                    uploaded_attachment.put("ID",Utils.json2JsonObject(upload_response.get("responseBody").toString()).get("ID").getAsString());
+                    attachments.add(uploaded_attachment);
+                } catch (Exception ex) {
+                    upload_errorMessage.append(String.format("Attachment %d: %s\n",i+1,ex.getMessage()));
+                }
+            } else {
+                upload_errorMessage.append(String.format("Attachment %d: Invalid File %s\n",i+1,file_path));
+            }
+        }
+
+        Map<String, Object> nfo = new HashMap<>();
+        if(upload_errorMessage.length() == 0) {
+            nfo.put("responseStatusCode",200);
+            nfo.put("responseBody", "SUCCESS");
+            nfo.put("data", attachments);
+        }else {
+            nfo.put("responseStatusCode",500);
+            nfo.put("responseBody", upload_errorMessage.toString());
+        }
+        return nfo;
+    }
     @Override
     public Map<String, Object> test(String payload) {
         String apiUrl = String.format("%s/valsync/property/related", this.dataSync_api);
