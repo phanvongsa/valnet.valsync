@@ -13,7 +13,7 @@ import java.sql.Types;
 @Component
 public class ComponentDaoImpl extends BaseDaoImp implements ComponentDao {
 
-    private final String upsert_procedurename = "COMPONENT_SEND_JSON_DATA";
+    private final String upsert_procedurename = "COMPONENT_GET_JSON_DATA";
 
     public ComponentDaoImpl(DataSource dataSource) {
         super(dataSource);
