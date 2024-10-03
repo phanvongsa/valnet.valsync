@@ -32,13 +32,14 @@ import org.apache.http.HttpEntity;
 public class PegaServicesImpl implements PegaServices {
     protected static final Logger logger = LoggerFactory.getLogger(PegaServices.class);
 
-    private final String dataSync_api;
-//    private final String attachments_api;
+//    private final String dataSync_api;
+////    private final String attachments_api;
+//
+////        private final String cases_api;
+//    private final HttpClient dataSyncHttpClient;
+//    private final HttpClient apiBaseHttpClient;
 
-//        private final String cases_api;
-    private final HttpClient dataSyncHttpClient;
-    private final HttpClient apiBaseHttpClient;
-
+    private final PegaSyncingServices pegaSyncingServices;
     private final String endpoint_property_related = "/valsync/property/related";
     private final String endpoint_district_basedate = "/valsync/districtbasedate";
     private final String endpoint_supplementary_valuation = "/valsync/suppval";
@@ -48,18 +49,10 @@ public class PegaServicesImpl implements PegaServices {
     private final String endpoint_cases_attachments = "/cases/{entityID}/attachments";
 
 
-    public PegaServicesImpl(PegaConfig cfg){
-        this.dataSync_api = cfg.datasync_api;
-        CredentialsProvider dataSyncCredentialsProvider = new BasicCredentialsProvider();
-        dataSyncCredentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(cfg.datasync_un, cfg.datasync_pw));
-        this.dataSyncHttpClient = HttpClients.custom().setDefaultCredentialsProvider(dataSyncCredentialsProvider).build();
-
-        //this.attachments_api = cfg.attachments_api;
-        CredentialsProvider baseCredentialsProvider = new BasicCredentialsProvider();
-        baseCredentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(cfg.datasync_un, cfg.datasync_pw));
-        this.apiBaseHttpClient = HttpClients.custom().setDefaultCredentialsProvider(baseCredentialsProvider).build();
-
-        //this.cases_api = cfg.cases_api;
+    public PegaServicesImpl(PegaSyncingServices pss) {
+        this.pegaSyncingServices = pss;
+        //this.dataSyncHttpClient = pegaSyncingServices.getHttpClient(PegaConfig.SyncServiceType.DATASYNC);
+        //this.apiBaseHttpClient = pegaSyncingServices.getHttpClient(PegaConfig.SyncServiceType.CASES_ATTACHMENTS);
     }
 
     @Override
@@ -106,6 +99,7 @@ public class PegaServicesImpl implements PegaServices {
         Map<String,Object> entity_payload = new HashMap<>();
         entity_payload.put("attachments",attachments);
 
+        /*
         if (entity_type.equals("CASE")) {
             api_end_point = this.endpoint_cases_attachments.replace("{entityID}", entity_id);
             nfo = sendRequest(apiBaseHttpClient, api_end_point, Utils.object2Json(entity_payload));
@@ -113,12 +107,22 @@ public class PegaServicesImpl implements PegaServices {
             nfo.put("responseStatusCode", 500);
             nfo.put("responseBody", "Invalid Entity Type");
         }
-
+        */
         return nfo;
     }
 
     private Map<String, Object> sendRequests(String api_end_point, String payload){
-        return sendRequest(dataSyncHttpClient, this.dataSync_api+api_end_point, payload);
+        HttpClient httpClient = null;
+
+        if(api_end_point.toLowerCase().startsWith("/attachments/"))
+            httpClient = this.pegaSyncingServices.getHttpClient(PegaConfig.SyncServiceType.ATTACHMENTS);
+        else if(api_end_point.toLowerCase().startsWith("/cases/") && api_end_point.toLowerCase().endsWith("/attachments"))
+            httpClient = this.pegaSyncingServices.getHttpClient(PegaConfig.SyncServiceType.CASES_ATTACHMENTS);
+        else
+            httpClient = this.pegaSyncingServices.getHttpClient(PegaConfig.SyncServiceType.DATASYNC);
+
+        return null;
+        //return sendRequest(dataSyncHttpClient, this.dataSync_api+api_end_point, payload);
     }
 
     private Map<String, Object> sendRequest(HttpClient client, String api_url, String payload){
@@ -178,8 +182,8 @@ public class PegaServicesImpl implements PegaServices {
                 HttpEntity multipart = builder.build();
                 req.setEntity(multipart);
                 try {
-                    setResponseMap(upload_response, this.apiBaseHttpClient.execute(req));
-                    uploaded_attachment.put("ID",Utils.json2JsonObject(upload_response.get("responseBody").toString()).get("ID").getAsString());
+//                    setResponseMap(upload_response, this.apiBaseHttpClient.execute(req));
+//                    uploaded_attachment.put("ID",Utils.json2JsonObject(upload_response.get("responseBody").toString()).get("ID").getAsString());
                     attachments.add(uploaded_attachment);
                 } catch (Exception ex) {
                     upload_errorMessage.append(String.format("Attachment %d: %s\n",i+1,ex.getMessage()));
@@ -202,11 +206,12 @@ public class PegaServicesImpl implements PegaServices {
     }
     @Override
     public Map<String, Object> test(String payload) {
-        String apiUrl = String.format("%s/valsync/property/related", this.dataSync_api);
+        String apiUrl = String.format("%s/valsync/property/related", "https://nswpe-valnet-dt1.pega.net/prweb/api/DataSync/v1");
+        HttpClient httpClient = this.pegaSyncingServices.getHttpClient(PegaConfig.SyncServiceType.DATASYNC);
         Map<String, Object> nfo = new HashMap<>();
         try {
             HttpPost req = new HttpPost(apiUrl);
-            HttpResponse response = dataSyncHttpClient.execute(req);
+            HttpResponse response = httpClient.execute(req);
             nfo.put("responseStatusCode",response.getStatusLine().getStatusCode());
             nfo.put("responseBody",getResponseBody(response));
         }catch (Exception ex){

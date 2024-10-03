@@ -7,7 +7,9 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClients;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PegaSyncingServicesImpl implements PegaSyncingServices {
 
     private final HttpClient dataSyncHttpClient;
