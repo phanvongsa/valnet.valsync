@@ -33,9 +33,9 @@ public class PegaServicesImpl implements PegaServices {
     protected static final Logger logger = LoggerFactory.getLogger(PegaServices.class);
 
     private final String dataSync_api;
-    private final String attachments_api;
+//    private final String attachments_api;
 
-    private final String cases_api;
+//        private final String cases_api;
     private final HttpClient dataSyncHttpClient;
     private final HttpClient apiBaseHttpClient;
 
@@ -44,8 +44,8 @@ public class PegaServicesImpl implements PegaServices {
     private final String endpoint_supplementary_valuation = "/valsync/suppval";
     private final String endpoint_land_value = "/valsync/landvalue";
 
-    private final String endpoint_attachments_upload = "/upload";
-    private final String endpoint_cases_attachments = "/{entityID}/attachments";
+    private final String endpoint_attachments_upload = "/attachments/upload";
+    private final String endpoint_cases_attachments = "/cases/{entityID}/attachments";
 
 
     public PegaServicesImpl(PegaConfig cfg){
@@ -54,12 +54,12 @@ public class PegaServicesImpl implements PegaServices {
         dataSyncCredentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(cfg.datasync_un, cfg.datasync_pw));
         this.dataSyncHttpClient = HttpClients.custom().setDefaultCredentialsProvider(dataSyncCredentialsProvider).build();
 
-        this.attachments_api = cfg.attachments_api;
-        CredentialsProvider attachmentsCredentialsProvider = new BasicCredentialsProvider();
-        attachmentsCredentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(cfg.datasync_un, cfg.datasync_pw));
-        this.apiBaseHttpClient = HttpClients.custom().setDefaultCredentialsProvider(attachmentsCredentialsProvider).build();
+        //this.attachments_api = cfg.attachments_api;
+        CredentialsProvider baseCredentialsProvider = new BasicCredentialsProvider();
+        baseCredentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(cfg.datasync_un, cfg.datasync_pw));
+        this.apiBaseHttpClient = HttpClients.custom().setDefaultCredentialsProvider(baseCredentialsProvider).build();
 
-        this.cases_api = cfg.cases_api;
+        //this.cases_api = cfg.cases_api;
     }
 
     @Override
@@ -107,7 +107,7 @@ public class PegaServicesImpl implements PegaServices {
         entity_payload.put("attachments",attachments);
 
         if (entity_type.equals("CASE")) {
-            api_end_point = this.cases_api + endpoint_cases_attachments.replace("{entityID}", entity_id);
+            api_end_point = this.endpoint_cases_attachments.replace("{entityID}", entity_id);
             nfo = sendRequest(apiBaseHttpClient, api_end_point, Utils.object2Json(entity_payload));
         } else {
             nfo.put("responseStatusCode", 500);
@@ -161,7 +161,7 @@ public class PegaServicesImpl implements PegaServices {
     private Map<String, Object> upload_attachments(JsonArray ajo){
         ArrayList<Map<String, String>> attachments = new ArrayList<>();
         StringBuilder upload_errorMessage = new StringBuilder();
-        String upload_attachments_api = this.attachments_api+this.endpoint_attachments_upload;
+        String upload_attachments_api = this.endpoint_attachments_upload;
         for(int i=0;i<ajo.size();i++){
             JsonObject attachment = ajo.get(i).getAsJsonObject();
             String file_path = attachment.getAsJsonObject().get("file").getAsString();
