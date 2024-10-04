@@ -1,6 +1,10 @@
 package au.gov.nsw.lpi.common;
 
+import au.gov.nsw.lpi.dao.BaseDaoImp;
 import com.google.gson.*;
+import org.apache.http.HttpResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -10,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Utils {
+    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
     public static ResponseEntity<String> getAsResponseEntity(Object o) {
         StandardisedResponse standardisedResponse;
         Gson gson = new Gson();
@@ -73,4 +78,19 @@ public class Utils {
     public static File getFileIfExists(String file_path) {
         return fileExists(file_path)? Paths.get(file_path).toFile():null;
     }
+
+//    public static StandardisedResponse getAsStandardisedResponse(HttpResponse httpResponse) {
+//        switch (httpResponse.getStatusLine().getStatusCode()) {
+//            case 200:
+//            case 201:
+//            case 202:
+//                return new StandardisedResponse(HttpStatus.OK, httpResponse.toString());
+//            case 400:
+//                return new StandardisedResponse(HttpStatus.BAD_REQUEST, httpResponse.get);
+//            case 500:
+//                return new StandardisedResponse(HttpStatus.INTERNAL_SERVER_ERROR, httpResponse.getStatusLine().getReasonPhrase());
+//            default:
+//                return new StandardisedResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown Http Status");
+//        }
+//    }
 }

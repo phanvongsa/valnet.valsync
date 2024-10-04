@@ -1,5 +1,7 @@
 package au.gov.nsw.lpi.service;
 
+import au.gov.nsw.lpi.common.StandardisedResponse;
+import au.gov.nsw.lpi.common.StandardisedResponseCode;
 import au.gov.nsw.lpi.common.Utils;
 import au.gov.nsw.lpi.dao.BaseDaoImp;
 import au.gov.nsw.lpi.domain.PegaConfig;
@@ -77,6 +79,46 @@ public class PegaServicesImpl implements PegaServices {
 
     @Override
     public Map<String, Object> attachments_associate(String payload) {
+        Map<String, Object> nfo = new HashMap<>();// pegaSyncingServices.executeRequest(PegaConfig.SyncServiceType.ATTACHMENTS_UPLOAD, payload);
+
+        boolean attachmentHasError = false;
+        StringBuilder errorMessage = new StringBuilder();
+
+        // 0. upload attachments and get ids
+        JsonArray ajo = Utils.json2JsonObject(payload).getAsJsonArray("attachments");
+        ArrayList<Map<String, String>> attachments = new ArrayList<>();
+        for(int i=0;i<ajo.size();i++){
+            StandardisedResponse standardisedResponse = new StandardisedResponse(pegaSyncingServices.executeRequest(PegaConfig.SyncServiceType.ATTACHMENTS_UPLOAD, ajo.get(i).getAsJsonObject().get("file").getAsString()));
+            if(standardisedResponse.code == StandardisedResponseCode.SUCCESS){
+                Map<String, String> uploaded_attachment = new HashMap<>();
+                uploaded_attachment.put("type","File");
+                uploaded_attachment.put("category","File");
+                uploaded_attachment.put("name",ajo.get(i).getAsJsonObject().get("name").getAsString());
+                uploaded_attachment.put("ID",Utils.json2JsonObject(standardisedResponse.data.toString()).get("ID").getAsString());
+                attachments.add(uploaded_attachment);
+            }
+            else{
+                attachmentHasError = true;
+                errorMessage.append(String.format("Attachment %d: %s\n",i+1,standardisedResponse.data==null?standardisedResponse.message:standardisedResponse.data.toString()));
+            }
+        }
+        // 1. associate attachments to entity
+        if(!attachmentHasError){
+            Map<String, Object> entity_payload = new HashMap<>();
+            entity_payload.put("entity",Utils.json2JsonObject(payload).getAsJsonObject("entity"));
+            entity_payload.put("attachments",attachments);
+            StandardisedResponse standardisedResponse = new StandardisedResponse(pegaSyncingServices.executeRequest(PegaConfig.SyncServiceType.CASES_ATTACHMENTS_LINK, Utils.object2Json(entity_payload)));
+            logger.debug(Utils.object2Json(standardisedResponse));
+            nfo.put("responseStatusCode", standardisedResponse.httpStatus.value());
+            nfo.put("responseBody", standardisedResponse.data.toString());
+        }else{
+            nfo.put("responseStatusCode", 500);
+            nfo.put("responseBody", errorMessage.toString());
+        }
+
+        return nfo;
+    }
+/*
         // 0. upload attachments and get ids
         JsonArray ajo = Utils.json2JsonObject(payload).getAsJsonArray("attachments");
         Map<String, Object> upload_response = upload_attachments(ajo);
@@ -98,7 +140,7 @@ public class PegaServicesImpl implements PegaServices {
         String api_end_point = "";
         Map<String,Object> entity_payload = new HashMap<>();
         entity_payload.put("attachments",attachments);
-
+/*
         /*
         if (entity_type.equals("CASE")) {
             api_end_point = this.endpoint_cases_attachments.replace("{entityID}", entity_id);
@@ -108,19 +150,21 @@ public class PegaServicesImpl implements PegaServices {
             nfo.put("responseBody", "Invalid Entity Type");
         }
         */
-        return nfo;
-    }
+        //Map<String, Object> nfo = new HashMap<>();
+        //nfo.put("responseStatusCode",200);
+        //nfo.put("responseBody", "TO DO");
+
 
     private Map<String, Object> sendRequests(String api_end_point, String payload){
         HttpClient httpClient = null;
-
+/*
         if(api_end_point.toLowerCase().startsWith("/attachments/"))
-            httpClient = this.pegaSyncingServices.getHttpClient(PegaConfig.SyncServiceType.ATTACHMENTS);
+            httpClient = this.pegaSyncingServices.getHttpClient(PegaConfig.SyncServiceType.ATTACHMENTS_UPLOAD);
         else if(api_end_point.toLowerCase().startsWith("/cases/") && api_end_point.toLowerCase().endsWith("/attachments"))
-            httpClient = this.pegaSyncingServices.getHttpClient(PegaConfig.SyncServiceType.CASES_ATTACHMENTS);
+            httpClient = this.pegaSyncingServices.getHttpClient(PegaConfig.SyncServiceType.CASES_ATTACHMENTS_LINK);
         else
             httpClient = this.pegaSyncingServices.getHttpClient(PegaConfig.SyncServiceType.DATASYNC);
-
+*/
         return null;
         //return sendRequest(dataSyncHttpClient, this.dataSync_api+api_end_point, payload);
     }
@@ -163,6 +207,7 @@ public class PegaServicesImpl implements PegaServices {
     }
 
     private Map<String, Object> upload_attachments(JsonArray ajo){
+/*
         ArrayList<Map<String, String>> attachments = new ArrayList<>();
         StringBuilder upload_errorMessage = new StringBuilder();
         String upload_attachments_api = this.endpoint_attachments_upload;
@@ -192,33 +237,33 @@ public class PegaServicesImpl implements PegaServices {
                 upload_errorMessage.append(String.format("Attachment %d: Invalid File %s\n",i+1,file_path));
             }
         }
-
+*/
         Map<String, Object> nfo = new HashMap<>();
-        if(upload_errorMessage.length() == 0) {
+//        if(upload_errorMessage.length() == 0) {
             nfo.put("responseStatusCode",200);
             nfo.put("responseBody", "SUCCESS");
-            nfo.put("data", attachments);
-        }else {
-            nfo.put("responseStatusCode",500);
-            nfo.put("responseBody", upload_errorMessage.toString());
-        }
+//            nfo.put("data", attachments);
+//        }else {
+//            nfo.put("responseStatusCode",500);
+//            nfo.put("responseBody", upload_errorMessage.toString());
+//        }
         return nfo;
     }
     @Override
     public Map<String, Object> test(String payload) {
         String apiUrl = String.format("%s/valsync/property/related", "https://nswpe-valnet-dt1.pega.net/prweb/api/DataSync/v1");
-        HttpClient httpClient = this.pegaSyncingServices.getHttpClient(PegaConfig.SyncServiceType.DATASYNC);
+        //HttpClient httpClient = this.pegaSyncingServices.getHttpClient(PegaConfig.SyncServiceType.DATASYNC);
         Map<String, Object> nfo = new HashMap<>();
-        try {
-            HttpPost req = new HttpPost(apiUrl);
-            HttpResponse response = httpClient.execute(req);
-            nfo.put("responseStatusCode",response.getStatusLine().getStatusCode());
-            nfo.put("responseBody",getResponseBody(response));
-        }catch (Exception ex){
-            nfo.put("responseStatusCode",500);
-            nfo.put("responseBody", ex.getMessage());
-            logger.error(ex.getMessage());
-        }
+//        try {
+//            HttpPost req = new HttpPost(apiUrl);
+//            HttpResponse response = httpClient.execute(req);
+//            nfo.put("responseStatusCode",response.getStatusLine().getStatusCode());
+//            nfo.put("responseBody",getResponseBody(response));
+//        }catch (Exception ex){
+//            nfo.put("responseStatusCode",500);
+//            nfo.put("responseBody", ex.getMessage());
+//            logger.error(ex.getMessage());
+//        }
         return nfo;
     }
 }
