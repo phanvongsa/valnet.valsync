@@ -30,6 +30,16 @@ public class PegaController extends BaseController {
         this.pegaServices = pegaServices;
     }
 
+    @RequestMapping(value="/test", method = POST)
+    public ResponseEntity<String> doPost(@RequestBody String requestBody, HttpServletRequest request) {
+        StandardisedResponse standardisedResponse = securityValidationRequest(requestBody, request);
+        if (standardisedResponse.code != StandardisedResponseCode.SUCCESS)
+            return standardisedResponse.getResponseEntity();
+
+        standardisedResponse = pegaServices.test(requestBody);
+        return standardisedResponse.getResponseEntity();
+    }
+
     @RequestMapping(value="/{entityName}/{actionName}", method = POST)
     public ResponseEntity<String> doPost(@PathVariable String entityName, @PathVariable String actionName, @RequestBody String requestBody, HttpServletRequest request) {
         StandardisedResponse standardisedResponse = securityValidationRequest(requestBody, request);
@@ -39,27 +49,27 @@ public class PegaController extends BaseController {
         String entityAction = (entityName+"/"+actionName).toLowerCase();
         switch(entityAction){
             case "property/related":
-                setWithPegaResponse(standardisedResponse, pegaServices.property_related(requestBody));
+                standardisedResponse = pegaServices.property_related(requestBody);
                 break;
             case "district/basedate":
-                setWithPegaResponse(standardisedResponse, pegaServices.district_basedate(requestBody));
+                standardisedResponse = pegaServices.district_basedate(requestBody);
                 break;
             case "supplementary/valuation":
-                setWithPegaResponse(standardisedResponse, pegaServices.supplementary_valuation(requestBody));
+                standardisedResponse = pegaServices.supplementary_valuation(requestBody);
                 break;
             case "land/value":
-                setWithPegaResponse(standardisedResponse, pegaServices.land_value(requestBody));
+                standardisedResponse = pegaServices.land_value(requestBody);
                 break;
             case "attachments/associate":
-                setWithPegaResponse(standardisedResponse, pegaServices.attachments_associate(requestBody));
+                standardisedResponse = pegaServices.attachments_associate(requestBody);
                 break;
             default:
                 standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,String.format("Invalid Request Action Call (%s)",entityAction));
                 break;
         }
-
         return standardisedResponse.getResponseEntity();
     }
+
 
     private void setWithPegaResponse(StandardisedResponse standardisedResponse, Map<String,Object> pegaResponse){
         logger.debug(Utils.object2Json(pegaResponse));

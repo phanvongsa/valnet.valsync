@@ -44,9 +44,6 @@ public class DealingController extends BaseController{
             case "update":
                 standardisedResponse.setData(dao.upsert(requestBody));
                 break;
-//            case "suppval/update":
-//                standardisedResponse.setData(dao.upsert_supplementary_value(requestBody));
-//                break;
             default:
                 standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,String.format("Invalid Request Action Call (%s)",entityAction));
                 break;

@@ -16,7 +16,7 @@ public abstract class BaseDaoImp implements BaseDao {
     protected final String catalogName = "VN_PEGA_INTEGRATION_API";
 
     public BaseDaoImp(DataSource dataSource){
-        logger.debug("BaseDao()");
+        logger.debug("BaseDao() <- "+ this.getClass().getName()+"()");
         this.dataSource = dataSource;
     }
 
@@ -25,18 +25,20 @@ public abstract class BaseDaoImp implements BaseDao {
     }
 
     protected String runStandardProcedure(String procedure_name, String payload){
-      String sql = String.format("{ ? = call %s.%s(?) }",this.catalogName, procedure_name);
-      try (Connection connection = dataSource.getConnection()){
-          try (CallableStatement cs = connection.prepareCall(sql)) {
-              Clob clob = connection.createClob();
-              clob.setString(1, payload);
-              cs.setClob(2, clob);
-              cs.registerOutParameter(1, Types.VARCHAR);
-              cs.execute();
-              return cs.getString(1);
-          }
-      }catch (Exception e){
-          return getExceptionResponse(e);
-      }
+        logger.debug("Calling procedure: "+procedure_name);
+        String sql = String.format("{ ? = call %s.%s(?) }",this.catalogName, procedure_name);
+        try (Connection connection = dataSource.getConnection()){
+            try (CallableStatement cs = connection.prepareCall(sql)) {
+                Clob clob = connection.createClob();
+                clob.setString(1, payload);
+                cs.setClob(2, clob);
+                cs.registerOutParameter(1, Types.VARCHAR);
+                cs.execute();
+                return cs.getString(1);
+            }
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            return getExceptionResponse(e);
+        }
     }
 }

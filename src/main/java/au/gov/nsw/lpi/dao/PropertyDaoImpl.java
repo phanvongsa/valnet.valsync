@@ -23,7 +23,6 @@ public class PropertyDaoImpl extends BaseDaoImp implements PropertyDao {
     @Override
     public String upsert_supplementary_value(String payload) {
         return runStandardProcedure(this.upsert_supplementary_value_procedurename,payload);
-
     }
 
     @Override

@@ -44,23 +44,20 @@ public class PegaSyncingServicesImpl implements PegaSyncingServices {
 
     @Override
     public HttpResponse executeRequest(PegaConfig.SyncServiceType serviceType, String payload) {
-        HttpPost request = createRequestsPost(serviceType, payload);
         HttpClient httpClient =  getHttpClient(serviceType);
+        HttpPost request = createRequestsPost(serviceType, payload);
         int statusCode = 200;
         String reasonPhrase = "OK";
         String responseString = null;
+
         if(request==null || httpClient==null){
             statusCode = 400;
             reasonPhrase = request==null?"Invalid Request Service Type or Payload":"Invalid HttpClient";
-            switch (serviceType) {
-                case ATTACHMENTS_UPLOAD:
-                    responseString = String.format("Unable to create request %s, file: %s does not exists",serviceType,payload);
-                    break;
-                default:
-                    responseString = String.format("Unable to create request %s, Payload: %s",serviceType, payload);
-                    break;
+            if (serviceType == PegaConfig.SyncServiceType.ATTACHMENTS_UPLOAD) {
+                responseString = String.format("Unable to create request %s, file: %s does not exists", serviceType, payload);
+            } else {
+                responseString = String.format("Unable to create request %s, Payload: %s", serviceType, payload);
             }
-            //responseString = request==null?String.format("Unable to create request, ",serviceType==PegaConfig.SyncServiceType.ATTACHMENTS_UPLOAD?"file: "+payload+ "does not exists":"Payload: "+payload):null;
         }else{
             try {
                 return httpClient.execute(request);
@@ -84,60 +81,37 @@ public class PegaSyncingServicesImpl implements PegaSyncingServices {
 
     private HttpPost createRequestsPost(PegaConfig.SyncServiceType serviceType, String payload){
         HttpPost request = null;
-        logger.debug(String.format("Creating request for %s",serviceType));
+        String api_endpoint = this.cfg.getApiEndpoint(serviceType);
+        logger.debug("Pega API Endpoint: "+api_endpoint);
         switch (serviceType) {
-//            case DATASYNC:
-//                request = new HttpPost(getApiUrl(serviceType));
-//                request.setHeader("Content-Type", "application/json");
-//                request.setEntity(new StringEntity(payload, "UTF-8"));
-//                break;
-//            case CASES_ATTACHMENTS_LINK:
-//                request = new HttpPost(getApiUrl(serviceType).replace("{ENTITY_ID}",payload));
-//                break;
+            case CASES_ATTACHMENTS_LINK:
+                String entity_id = Utils.json2JsonObject(payload).getAsJsonObject("entity").get("id").getAsString();
+                String attachments_payload = String.format("{\"attachments\":%s}",Utils.json2JsonObject(payload).getAsJsonArray("attachments").toString());
+                api_endpoint = api_endpoint.replace("{ENTITY_ID}",entity_id);
+                request = new HttpPost(api_endpoint);
+                request.setHeader("Content-Type", "application/json");
+                request.setEntity(new StringEntity(attachments_payload, "UTF-8"));
+                break;
             case ATTACHMENTS_UPLOAD:
                 File file = Utils.getFileIfExists(payload);
                 if(file!=null) {
-                    request = new HttpPost(getApiUrl(serviceType));
                     MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                     builder.addBinaryBody("content", file, org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM, file.getName());
+                    request = new HttpPost(api_endpoint);
                     request.setEntity(builder.build());
                 }
                 break;
+            default:
+                request = new HttpPost(api_endpoint);
+                request.setHeader("Content-Type", "application/json");
+                request.setEntity(new StringEntity(payload, "UTF-8"));
+                break;
         }
-//        if(serviceType == PegaConfig.SyncServiceType.ATTACHMENTS_UPLOAD){
-//            File file = Utils.getFileIfExists(payload);
-//            if(file!=null){
-//                request = new HttpPost(getApiUrl(serviceType));
-//                MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-//                builder.addBinaryBody("content", file, org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM, file.getName());
-//                request.setEntity(builder.build());
-//            }else{
-//                logger.error(String.format("Unable to create request, file doesnt exists: %s",payload));
-//            }
-//        }
 
         return request;
     }
-    private String getApiUrl(PegaConfig.SyncServiceType serviceType){
-        switch (serviceType) {
-            case DATASYNC:
-                return this.cfg.datasync_api;
-            case ATTACHMENTS_UPLOAD:
-                return this.cfg.base_api+"/attachments/upload";
-            case CASES_ATTACHMENTS_LINK:
-                return this.cfg.base_api+"/cases/{ENTITY_ID}/attachments/";
-        }
-        return null;
-    }
 
     private HttpClient getHttpClient(PegaConfig.SyncServiceType serviceType) {
-        switch (serviceType) {
-            case DATASYNC:
-                return this.dataSyncHttpClient;
-            case ATTACHMENTS_UPLOAD:
-            case CASES_ATTACHMENTS_LINK:
-                return this.baseHttpClient;
-        }
-        return null;
+        return serviceType.toString().startsWith("DATASYNC_") ? this.dataSyncHttpClient : this.baseHttpClient;
     }
 }

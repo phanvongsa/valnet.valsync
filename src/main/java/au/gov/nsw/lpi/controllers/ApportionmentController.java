@@ -28,10 +28,6 @@ public class ApportionmentController extends BaseController{
         return executeEntityAction(actionName, requestBody, request);
     }
 
-//    @RequestMapping(value="/{entityName}/{actionName}", method = POST)
-//    public ResponseEntity<String> doPost(@PathVariable String entityName, @PathVariable String actionName, @RequestBody String requestBody, HttpServletRequest request) {
-//        return executeEntityAction(entityName+"/"+actionName, requestBody, request);
-//    }
 
 
     public ResponseEntity<String> executeEntityAction(String entityAction, String requestBody, HttpServletRequest request) {

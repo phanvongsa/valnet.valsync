@@ -1,20 +1,21 @@
 package au.gov.nsw.lpi.service;
 
+import au.gov.nsw.lpi.common.StandardisedResponse;
+
 import java.util.Map;
 
 public interface PegaServices {
 
-    Map<String, Object> test(String payload);
+    StandardisedResponse test(String payload);
 
-    Map<String, Object> property_related(String payload);
+    StandardisedResponse property_related(String payload);
 
-    Map<String, Object> district_basedate(String payload);
+    StandardisedResponse district_basedate(String payload);
 
-    Map<String, Object> supplementary_valuation(String payload);
+    StandardisedResponse supplementary_valuation(String payload);
 
-    Map<String, Object> land_value(String payload);
+    StandardisedResponse land_value(String payload);
 
-    Map<String, Object> attachments_associate(String payload);
-
+    StandardisedResponse attachments_associate(String payload);
 
 }

@@ -1,6 +1,7 @@
 package au.gov.nsw.lpi.common;
 
 import au.gov.nsw.lpi.controllers.ComponentController;
+import com.google.gson.JsonObject;
 import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,14 +28,33 @@ public class StandardisedResponse {
 
     public StandardisedResponse(HttpResponse httpResponse) {
         this.httpStatus = HttpStatus.valueOf(httpResponse.getStatusLine().getStatusCode());
-        this.data = getResponseBody(httpResponse);
+        String raw_response = getResponseBody(httpResponse);
+logger.debug("raw_response: " + raw_response);
+        if(raw_response!=null && !raw_response.isEmpty() && Utils.isValidJson(raw_response)){
+            JsonObject jo = Utils.json2JsonObject(raw_response);
+            // check if standardised response, else just return the raw response to data
+            if(jo.has("code") || jo.has("message") || jo.has("data")){
+                if(jo.has("code") && !jo.get("code").isJsonNull())
+                    this.httpStatus = jo.get("code").toString().contains("ERROR")?HttpStatus.INTERNAL_SERVER_ERROR:HttpStatus.OK;
+
+                if(jo.has("message") && !jo.get("message").isJsonNull())
+                    this.message = jo.get("message").getAsString();
+
+                if(jo.has("data") && !jo.get("data").isJsonNull())
+                    this.data = jo.get("data").getAsString();
+            }else
+                this.data = raw_response;
+        }
+        else
+            this.data = raw_response;
+
         initialiseCodeMessage();
     }
 
     private void initialiseCodeMessage(){
         this.code = this.httpStatus.value()>=200 && this.httpStatus.value()<300?StandardisedResponseCode.SUCCESS:StandardisedResponseCode.ERROR;
-//        logger.debug(String.format("Http Status: %s | %s | %S",this.httpStatus,this.httpStatus.value(), this.code));
-
+        if(this.message!=null && !this.message.isEmpty())
+            return;
         switch (this.httpStatus){
             case CREATED:
                 this.message = "Resource Created";
@@ -49,18 +69,17 @@ public class StandardisedResponse {
                 this.message = "Unauthorised Access";
                 break;
             case BAD_REQUEST:
-                this.message = "Incorrect API URL or Malformed JSON";
+                this.message = "Incorrect API URL, Malformed JSON or Invalid Payload Data";
                 break;
             case FORBIDDEN:
                 this.message = "Forbidden Access";
                 break;
+            case NOT_FOUND:
+                this.message = "Resource Not Found";
+                break;
             default:
                 this.message = "Unknown Http Status";
         }
-
-
-            //logger.error(String.format("Http Status: %s | %s | %S",this.httpStatus,this.httpStatus.value(), this.code));
-
 
     }
 
