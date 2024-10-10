@@ -66,6 +66,8 @@ public class PegaServicesImpl implements PegaServices {
                 uploaded_attachment.put("type","File");
                 uploaded_attachment.put("category","File");
                 uploaded_attachment.put("name",ajo.get(i).getAsJsonObject().get("name").getAsString());
+logger.debug("standardisedResponse");
+logger.debug(Utils.object2Json(standardisedResponse));
                 uploaded_attachment.put("ID",Utils.json2JsonObject(standardisedResponse.data.toString()).get("ID").getAsString());
                 attachments.add(uploaded_attachment);
             }

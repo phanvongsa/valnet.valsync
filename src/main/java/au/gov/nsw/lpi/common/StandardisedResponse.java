@@ -30,9 +30,10 @@ public class StandardisedResponse {
         this.httpStatus = HttpStatus.valueOf(httpResponse.getStatusLine().getStatusCode());
         String raw_response = getResponseBody(httpResponse);
 logger.debug("raw_response: " + raw_response);
+        // check the type of response, if json whether its from datasync or pega based response
         if(raw_response!=null && !raw_response.isEmpty() && Utils.isValidJson(raw_response)){
             JsonObject jo = Utils.json2JsonObject(raw_response);
-            // check if standardised response, else just return the raw response to data
+            // check if standardised response {"code":"","message":"","data":"Object"}
             if(jo.has("code") || jo.has("message") || jo.has("data")){
                 if(jo.has("code") && !jo.get("code").isJsonNull())
                     this.httpStatus = jo.get("code").toString().contains("ERROR")?HttpStatus.INTERNAL_SERVER_ERROR:HttpStatus.OK;
@@ -42,11 +43,21 @@ logger.debug("raw_response: " + raw_response);
 
                 if(jo.has("data") && !jo.get("data").isJsonNull())
                     this.data = jo.get("data").getAsString();
-            }else
+            }else if (jo.has("errorClassification") && jo.has("errorDetails")){
+                // standard pega based error response
+                this.httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+                StringBuilder errormessages = new StringBuilder();
+                jo.getAsJsonArray("errorDetails").forEach(e -> {
+                    errormessages.append(e.getAsJsonObject().get("message").getAsString()).append("\n");
+                    errormessages.append(e.getAsJsonObject().get("localizedValue").getAsString());
+                });
+                this.message = errormessages.toString();
                 this.data = raw_response;
-        }
-        else
+            } else
+                this.data = raw_response;
+        } else // return as raw string response
             this.data = raw_response;
+
 
         initialiseCodeMessage();
     }
