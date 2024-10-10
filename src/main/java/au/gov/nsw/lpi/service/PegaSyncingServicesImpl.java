@@ -2,8 +2,6 @@ package au.gov.nsw.lpi.service;
 
 import au.gov.nsw.lpi.common.Utils;
 import au.gov.nsw.lpi.domain.PegaConfig;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -21,9 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class PegaSyncingServicesImpl implements PegaSyncingServices {

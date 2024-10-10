@@ -58,7 +58,6 @@ logger.debug("raw_response: " + raw_response);
         } else // return as raw string response
             this.data = raw_response;
 
-
         initialiseCodeMessage();
     }
 

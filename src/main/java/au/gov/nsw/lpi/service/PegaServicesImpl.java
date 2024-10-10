@@ -51,7 +51,6 @@ public class PegaServicesImpl implements PegaServices {
 
     @Override
     public StandardisedResponse attachments_associate(String payload) {
-        //Map<String, Object> nfo = new HashMap<>();
 
         boolean attachmentHasError = false;
         StringBuilder errorMessage = new StringBuilder();

@@ -3,7 +3,6 @@ package au.gov.nsw.lpi.controllers;
 import au.gov.nsw.lpi.common.StandardisedResponse;
 import au.gov.nsw.lpi.common.StandardisedResponseCode;
 import au.gov.nsw.lpi.dao.DealingDao;
-//import au.gov.nsw.lpi.dao.PropertyDao;
 import au.gov.nsw.lpi.service.SecurityService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -78,19 +78,4 @@ public class Utils {
     public static File getFileIfExists(String file_path) {
         return fileExists(file_path)? Paths.get(file_path).toFile():null;
     }
-
-//    public static StandardisedResponse getAsStandardisedResponse(HttpResponse httpResponse) {
-//        switch (httpResponse.getStatusLine().getStatusCode()) {
-//            case 200:
-//            case 201:
-//            case 202:
-//                return new StandardisedResponse(HttpStatus.OK, httpResponse.toString());
-//            case 400:
-//                return new StandardisedResponse(HttpStatus.BAD_REQUEST, httpResponse.get);
-//            case 500:
-//                return new StandardisedResponse(HttpStatus.INTERNAL_SERVER_ERROR, httpResponse.getStatusLine().getReasonPhrase());
-//            default:
-//                return new StandardisedResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown Http Status");
-//        }
-//    }
 }
