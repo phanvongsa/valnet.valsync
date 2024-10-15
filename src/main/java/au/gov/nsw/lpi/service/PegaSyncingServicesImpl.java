@@ -74,6 +74,11 @@ public class PegaSyncingServicesImpl implements PegaSyncingServices {
         return response;
     }
 
+    @Override
+    public String saveDocumentFile(String base64String_data, String fileName) {
+        return Utils.saveBase64File(base64String_data, this.cfg.documents_upload_dir+"/"+fileName);
+    }
+
     private HttpPost createRequestsPost(PegaConfig.SyncServiceType serviceType, String payload){
         HttpPost request = null;
         String api_endpoint = this.cfg.getApiEndpoint(serviceType);
@@ -82,7 +87,7 @@ public class PegaSyncingServicesImpl implements PegaSyncingServices {
             case CASES_ATTACHMENTS_LINK:
                 String entity_id = Utils.json2JsonObject(payload).getAsJsonObject("entity").get("id").getAsString();
                 String attachments_payload = String.format("{\"attachments\":%s}",Utils.json2JsonObject(payload).getAsJsonArray("attachments").toString());
-                api_endpoint = api_endpoint.replace("{ENTITY_ID}",entity_id);
+                api_endpoint = api_endpoint.replace("{ENTITY_ID}",Utils.urlEncode(entity_id));
                 request = new HttpPost(api_endpoint);
                 request.setHeader("Content-Type", "application/json");
                 request.setEntity(new StringEntity(attachments_payload, "UTF-8"));

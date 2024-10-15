@@ -3,6 +3,9 @@ package au.gov.nsw.lpi.domain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
+
+import java.util.Objects;
+
 public class PegaConfig {
     protected static final Logger logger = LoggerFactory.getLogger(PegaConfig.class);
     public static enum SyncServiceType {
@@ -22,6 +25,8 @@ public class PegaConfig {
     public String datasync_un;
     public String datasync_pw;
 
+    public String documents_upload_dir;
+    public boolean documents_upload_cleanup = false;
     private Environment env;
     public PegaConfig(Environment env){
         this.env = env;
@@ -35,6 +40,9 @@ public class PegaConfig {
         this.datasync_api= env.getProperty("pega.datasync.api");
         this.datasync_un = env.containsProperty("pega.datasync.un")?env.getProperty("pega.datasync.un"):this.base_un;
         this.datasync_pw = env.containsProperty("pega.datasync.pw")?env.getProperty("pega.datasync.pw"):this.base_pw;
+        this.documents_upload_dir = env.getProperty("documents.upload.dir");
+        this.documents_upload_cleanup = env.containsProperty("documents.upload.cleanup")&& Objects.equals(env.getProperty("documents.upload.cleanup"), "true");
+
     }
 
     public String getApiEndpoint(SyncServiceType serviceType){

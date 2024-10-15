@@ -12,5 +12,6 @@ public interface PegaSyncingServices {
 
     public HttpResponse executeRequest(PegaConfig.SyncServiceType serviceType, String payload);
 
+    public String saveDocumentFile(String fileName, String base64String_data);
     //public HttpPost createRequestPost(PegaConfig.SyncServiceType serviceType, String payload);
 }

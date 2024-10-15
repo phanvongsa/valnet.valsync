@@ -78,4 +78,35 @@ public class Utils {
     public static File getFileIfExists(String file_path) {
         return fileExists(file_path)? Paths.get(file_path).toFile():null;
     }
+
+    // take in a base64 string to create a file and return the file path
+    public static String saveBase64File(String base64String, String file_name) {
+        try {
+            byte[] decodedBytes = java.util.Base64.getDecoder().decode(base64String);
+            Path path = Paths.get(file_name);
+            java.nio.file.Files.write(path, decodedBytes);
+            return path.toString();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return null;
+        }
+    }
+
+    // get file extension from file name
+    public static String getFileExtension(String file_name) {
+        return file_name.substring(file_name.lastIndexOf("."));
+    }
+
+    // urlencode string or return string on error
+    public static String urlEncode(String value) {
+        try {
+            return java.net.URLEncoder.encode(value, "UTF-8");
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return value;
+        }
+    }
+
+
+
 }

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
 @Service
 public class PegaServicesImpl implements PegaServices {
     protected static final Logger logger = LoggerFactory.getLogger(PegaServices.class);
@@ -58,13 +60,19 @@ public class PegaServicesImpl implements PegaServices {
         // 0. upload attachments and get ids
         JsonArray ajo = Utils.json2JsonObject(payload).getAsJsonArray("attachments");
         ArrayList<Map<String, String>> attachments = new ArrayList<>();
+        logger.debug("Processing Attachments");
         for(int i=0;i<ajo.size();i++){
-            standardisedResponse = new StandardisedResponse(pegaSyncingServices.executeRequest(PegaConfig.SyncServiceType.ATTACHMENTS_UPLOAD, ajo.get(i).getAsJsonObject().get("file").getAsString()));
+            String attachment_name = ajo.get(i).getAsJsonObject().get("name").getAsString();
+            logger.debug("  "+i+": "+ attachment_name);
+            String attachment_filepath = pegaSyncingServices.saveDocumentFile(ajo.get(i).getAsJsonObject().get("data").getAsString(),UUID.randomUUID().toString()+Utils.getFileExtension(attachment_name));
+            logger.debug("      ==> Saving as "+attachment_filepath);
+            standardisedResponse = new StandardisedResponse(pegaSyncingServices.executeRequest(PegaConfig.SyncServiceType.ATTACHMENTS_UPLOAD, attachment_filepath));
+            logger.debug("      ==> Uploading "+(standardisedResponse.code==StandardisedResponseCode.SUCCESS?"OK":"ERROR"));
             if(standardisedResponse.code == StandardisedResponseCode.SUCCESS){
                 Map<String, String> uploaded_attachment = new HashMap<>();
                 uploaded_attachment.put("type","File");
                 uploaded_attachment.put("category","File");
-                uploaded_attachment.put("name",ajo.get(i).getAsJsonObject().get("name").getAsString());
+                uploaded_attachment.put("name",attachment_name);
 logger.debug("standardisedResponse");
 logger.debug(Utils.object2Json(standardisedResponse));
                 uploaded_attachment.put("ID",Utils.json2JsonObject(standardisedResponse.data.toString()).get("ID").getAsString());
@@ -74,6 +82,7 @@ logger.debug(Utils.object2Json(standardisedResponse));
                 attachmentHasError = true;
                 errorMessage.append(String.format("Attachment %d: %s\n",i+1,standardisedResponse.data==null?standardisedResponse.message:standardisedResponse.data.toString()));
             }
+
         }
         // 1. associate attachments to entity
         if(!attachmentHasError){
@@ -83,7 +92,6 @@ logger.debug(Utils.object2Json(standardisedResponse));
             standardisedResponse = new StandardisedResponse(pegaSyncingServices.executeRequest(PegaConfig.SyncServiceType.CASES_ATTACHMENTS_LINK, Utils.object2Json(entity_payload)));
         }else
             standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,errorMessage.toString());
-
         return standardisedResponse;
     }
 }
