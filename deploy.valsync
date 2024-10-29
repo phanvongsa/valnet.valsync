@@ -1,0 +1,43 @@
+#! /bin/bash
+
+app_file=valsync.war
+
+echo "===== Deploying Valsync ====="
+
+echo ">> Running as $(whoami) user"
+
+echo ">> Building Deploy Script ${app_file}"
+
+echo "cd ~" > ./__tmp.sh
+
+cat <<EOF > ./__tmp.sh
+
+echo ">>>> Running as \$(whoami)"
+source_file=/home/valro/wars/$app_file
+destination_file=/usr/local/tomcat/webapps/$app_file
+cd ~
+if [[ -e "\$source_file" ]]; then
+  echo "$app_file source exists"
+  if [[ -e "\$destination_file" ]]; then
+    echo "archiving currently deployed"
+    mv \$destination_file "\$destination_file.\$(date +%Y%m%d%H%M%S)"
+  fi
+  echo "copying source to destination"
+  cp \$source_file \$destination_file
+  echo "copying complete"
+else
+  echo "$app_file source file does not exists"
+  exit 1
+fi
+EOF
+
+echo ">>>> Running Deploy Script: Start"
+sudo su - tomcat < ~/__tmp.sh
+echo ">>>> Running Deploy Script: Complete"
+echo ">>>> Cleanup Deploy Script/WAR"
+rm ~/__tmp.sh
+rm ~/wars/$app_file
+
+echo ">> Complete"
+
+exit

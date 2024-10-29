@@ -103,7 +103,7 @@ if [[ "$action" == "deploy" || "$action" == "release" ]]; then
   sshpass -p ${web_app_pw} scp $local_war_file $web_app_un@$web_app_server:${remote_war_file}
   echo "OK"
   
-  #sshpass -p ${web_app_pw} ssh $web_app_un@$web_app_server 'bash ~/deploy.valsync.sh'
+  sshpass -p ${web_app_pw} ssh $web_app_un@$web_app_server 'bash ~/deploy.valsync'
   
   echo "Run ~/deploy.valsync.sh on server as web ssh user"  
 fi
