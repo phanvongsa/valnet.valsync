@@ -1,10 +1,8 @@
 #! /bin/bash
-
 if [ "$#" -lt 2 ]; then
     echo "Usage: $0 <action build|upload|deploy|release> <profile local|dev|uat|prod>"
     exit 1
 fi
-
 
 . ./build.conf
 
@@ -12,8 +10,9 @@ action=$1
 profile=$2
 target_file="/mnt/source/$project_name/target/$app_name-$profile.war"
 release_file="/mnt/release/$app_name-$profile.war"
-war_directory=$war_directory
 local_war_directory="/mnt/wars"
+
+
 ### BUILD
 if [[ "$action" == "build" || "$action" == "release" ]]; then
   if [[ -e "$release_file" ]]; then
@@ -22,7 +21,7 @@ if [[ "$action" == "build" || "$action" == "release" ]]; then
   fi
 
   # > Build
-  echo "Builing Project"
+  echo "Building Project"
   mvn package clean package -P$profile
 
   # > Copy to Release folder
@@ -31,9 +30,9 @@ if [[ "$action" == "build" || "$action" == "release" ]]; then
     cp "$target_file" "$release_file"
     
     if [[ -e "$release_file" ]]; then
-      echo "Copy to realese folder success"
+      echo "Copy to release folder success"
     else
-      echo "Copy to realease folder error"
+      echo "Copy to release folder error"
       exit 1
     fi
 
@@ -41,8 +40,8 @@ if [[ "$action" == "build" || "$action" == "release" ]]; then
     echo "Build Error"
     exit 1
   fi
-fi
 
+fi
 ### UPLOAD
 if [[ "$action" == "upload" || "$action" == "release" ]]; then  
   echo "Uploading ==> WAR Server ($war_server)"
@@ -61,48 +60,50 @@ fi
 
 ### DEPLOY
 # --> 0.  download war file war server
-# --> 1.  scp into web server /home/account/wars
+# --> 1.  scp into web server /home/{account}/wars
 # --> 2.  ssh into web server
 # -->   2.1  swicth to web server account (tomcat)
 # -->   2.2  back up existing war file
-# -->   2.3  copy /home/account/wars/app.war to webapps/
+# -->   2.3  copy /home/{account}/wars/app.war to webapps/
 
 if [[ "$action" == "deploy" || "$action" == "release" ]]; then
-  echo "Deploying Application ==> WEB Server ($profile)"  
-
-  ## 0
+  echo "Deploying Application ==> WEB Server ($profile)"
+  
   echo "  ==> Applying profile server settings"
   case $profile in
     "local")
-        web_app_server=$local_server
-        web_app_un=$local_un
-        web_app_pw=$local_pw
-        web_war_directory=$local_wars_directory
-        web_app_directory=$local_webapp_directory
+        web_app_server=$server_local
+        web_app_un=$un_local
+        web_app_pw=$pw_local
+        web_app_war_directory=$server_war_directory_local
+        web_app_directory=$webapp_directory_local        
+        tomcat_un=$tomcat_un_local
+        tomcat_pw=$tomcat_pw_local
         ;;  
     *)
         echo "Unknown profile $profile."
         exit 1
         ;;
   esac
-  echo "  ==> Retrieving application from WAR Server"
-  sshpass -p ${war_pw} sftp -oBatchMode=no -b - ${war_un}@${war_server} <<EOF  
-    get $war_directory/$app_name-$profile.war $local_war_directory
-    bye
-EOF
+  ## 0.  download war file war server
+  printf "  Retrieving application from WAR Server  => "
+  sshpass -p ${war_pw} scp ${war_un}@${war_server}:$war_directory/$app_name-$profile.war $local_war_directory
+  
+  local_war_file="$local_war_directory/$app_name-$profile.war"
+  if [ ! -f $local_war_file ]; then
+    echo "Fail"
+    exit 1  
+  fi
+  echo "OK"
 
-  echo "  ==> Uploading to Web App Server"
-  echo "local: $local_war_directory/$app_name-$profile.war"
-  echo "remote: $web_app_un@$web_app_server:$web_war_directory"
-  sshpass -p "$web_app_pw" scp "$local_war_directory/$app_name-$profile.war" "$web_app_un@$web_app_server:$web_war_directory"
-
-#   local_war_file="$local_war_directory/$app_name-$profile.war"
-#   remote_war_file="$web_app_directory/$app_name.war"
-# sshpass -p ${web_app_pw} sftp -oBatchMode=no -b - ${web_app_un}@${web_app_server} <<EOF  
-#   put $local_war_file $remote_war_file
-#   bye
-#EOF
-
+  ## 1. copy file to web server
+  remote_war_file="$web_app_war_directory/$app_name.war"
+  echo $remote_war_file 
+  printf "  Putting application on Web Server  => "
+  sshpass -p ${web_app_pw} scp $local_war_file $web_app_un@$web_app_server:${remote_war_file}
+  echo "OK"
+  
+  #sshpass -p ${web_app_pw} ssh $web_app_un@$web_app_server 'bash ~/deploy.valsync.sh'
+  
+  echo "Run ~/deploy.valsync.sh on server as web ssh user"  
 fi
-#cd $war_directory
-#get $app_name-$profile.war /root
