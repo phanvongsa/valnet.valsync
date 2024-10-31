@@ -12,6 +12,7 @@ target_file="/mnt/source/$project_name/target/$app_name-$profile.war"
 release_file="/mnt/release/$app_name-$profile.war"
 local_war_directory="/mnt/wars"
 
+
 ### BUILD
 if [[ "$action" == "build" || "$action" == "release" ]]; then
   if [[ -e "$release_file" ]]; then
@@ -78,32 +79,14 @@ if [[ "$action" == "deploy" || "$action" == "release" ]]; then
         web_app_directory=$webapp_directory_local        
         tomcat_un=$tomcat_un_local
         tomcat_pw=$tomcat_pw_local
-        ;;
-    "dev")
-        web_app_server=$server_dev
-        web_app_un=$un_dev
-        web_app_pw=$pw_dev
-        web_app_war_directory=$server_war_directory_dev
-        web_app_directory=$webapp_directory_dev  
-        tomcat_un=$tomcat_un_dev
-        tomcat_pw=$tomcat_pw_dev
-        ;;
-    "uat")
-        web_app_server=$server_uat
-        web_app_un=$un_uat
-        web_app_pw=$pw_uat
-        web_app_war_directory=$server_war_directory_uat
-        web_app_directory=$webapp_directory_uat
-        tomcat_un=$tomcat_un_uat
-        tomcat_pw=$tomcat_pw_uat
-        ;;
+        ;;  
     *)
         echo "Unknown profile $profile."
         exit 1
         ;;
   esac
   ## 0.  download war file war server
-  printf "  Retrieving application from WAR Server  => \n"
+  printf "  Retrieving application from WAR Server  => "
   sshpass -p ${war_pw} scp ${war_un}@${war_server}:$war_directory/$app_name-$profile.war $local_war_directory
   
   local_war_file="$local_war_directory/$app_name-$profile.war"
@@ -116,13 +99,11 @@ if [[ "$action" == "deploy" || "$action" == "release" ]]; then
   ## 1. copy file to web server
   remote_war_file="$web_app_war_directory/$app_name.war"
   echo $remote_war_file 
-  printf "  Putting application on Web Server  => \n"
+  printf "  Putting application on Web Server  => "
   sshpass -p ${web_app_pw} scp $local_war_file $web_app_un@$web_app_server:${remote_war_file}
   echo "OK"
   
-  if [[ $profile == "local" || $profile == "dev" ]]; then
-    sshpass -p ${web_app_pw} ssh $web_app_un@$web_app_server 'bash ~/deploy.valsync'
-  else
-    echo "Run ~/deploy.valsync.sh on $profile server as $web_app_un"  
-  fi  
+  sshpass -p ${web_app_pw} ssh $web_app_un@$web_app_server 'bash ~/deploy.valsync'
+  
+  echo "Run ~/deploy.valsync.sh on server as web ssh user"  
 fi

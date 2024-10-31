@@ -16,9 +16,9 @@ echo ">>>> Running as \$(whoami)"
 source_file=/home/valro/wars/$app_file
 destination_file=/usr/local/tomcat/webapps/$app_file
 cd ~
-if [[ -e "\$source_file" ]]; then
+if [[ -f "\$source_file" ]]; then
   echo "$app_file source exists"
-  if [[ -e "\$destination_file" ]]; then
+  if [[ -f "\$destination_file" ]]; then
     echo "archiving currently deployed"
     mv \$destination_file "\$destination_file.\$(date +%Y%m%d%H%M%S)"
   fi
