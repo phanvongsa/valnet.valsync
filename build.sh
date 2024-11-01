@@ -11,6 +11,7 @@ profile=$2
 target_file="/mnt/source/$project_name/target/$app_name-$profile.war"
 release_file="/mnt/release/$app_name-$profile.war"
 local_war_directory="/mnt/wars"
+deploy_file="/mnt/source/$project_name/deploy.$app_name.$profile"
 
 ### BUILD
 if [[ "$action" == "build" || "$action" == "release" ]]; then
@@ -102,6 +103,7 @@ if [[ "$action" == "deploy" || "$action" == "release" ]]; then
         exit 1
         ;;
   esac
+  
   ## 0.  download war file war server
   printf "  Retrieving application from WAR Server  => \n"
   sshpass -p ${war_pw} scp ${war_un}@${war_server}:$war_directory/$app_name-$profile.war $local_war_directory
@@ -114,15 +116,20 @@ if [[ "$action" == "deploy" || "$action" == "release" ]]; then
   echo "OK"
 
   ## 1. copy file to web server
-  remote_war_file="$web_app_war_directory/$app_name.war"
-  echo $remote_war_file 
+  remote_war_file="$web_app_war_directory/$app_name.war"  
   printf "  Putting application on Web Server  => \n"
   sshpass -p ${web_app_pw} scp $local_war_file $web_app_un@$web_app_server:${remote_war_file}
   echo "OK"
   
+  if [ -f $deploy_file ]; then
+    printf "  Putting deploy.$app_name.$profile on Web Server  => \n"
+    sshpass -p ${web_app_pw} scp $deploy_file "$web_app_un@$web_app_server:~/deploy.$app_name"
+    echo "OK"
+  fi
+    
   if [[ $profile == "local" || $profile == "dev" ]]; then
     sshpass -p ${web_app_pw} ssh $web_app_un@$web_app_server 'bash ~/deploy.valsync'
-  else
-    echo "Run ~/deploy.valsync.sh on $profile server as $web_app_un"  
+  else  
+    echo "Run ~/deploy.$app_name on $profile server as $web_app_un"  
   fi  
 fi
