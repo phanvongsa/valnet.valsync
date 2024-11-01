@@ -1,0 +1,61 @@
+#! /bin/bash
+app_file=valsync.war
+source_file=/home/tomcat/wars/$app_file
+destination_file=/usr/local/tomcat/webapps/$app_file
+archive_file=/home/tomcat/wars.archive/$app_file.$(date +%Y%m%d%H%M%S)
+original_source_file=/home/valro/wars/$app_file
+tmp_source_file=/tmp/$app_file
+
+echo "==================="
+printf "Running as (0) "
+whoami
+echo "==================="
+
+## copy file to folder that can be accessed by tomcat user
+printf ">> Checking Original Source file: "
+if [[ -f $original_source_file ]]; then
+  printf "OK\n"
+  echo "copying $original_source_file ==> $tmp_source_file"
+  cp $original_source_file $tmp_source_file
+else
+  printf "FAIL\n"
+  echo "$original_source_file source file does not exists"
+  exit 1
+fi
+
+sudo su - tomcat <<EOF
+echo "===================="
+printf "Running as (1) "
+whoami
+echo "===================="
+printf "Checking source $tmp_source_file at /tmp: "
+if [ ! -f $tmp_source_file ]; then
+  echo "FAIL (/tmp source does not exists)"
+  exit 1
+else
+  echo "OK"
+  echo "copy /tmp source to source folder"
+  cp $tmp_source_file $source_file
+
+  echo "Check if there is a currently deploy version of the application: "
+  if [ ! -f $destination_file ]; then
+    echo "  ==> OK, non previous deploy"    
+  else
+    echo "  ==> OK, previously deploys will archive version"
+    mv $destination_file $archive_file
+  fi
+
+  printf "Copying from source to webapps: "
+  mv $source_file $destination_file
+  echo "OK"
+fi
+
+EOF
+echo "===================="
+printf "Running as (2) "
+whoami
+echo "===================="
+echo "Cleanup $original_source_file, $tmp_source_file"
+rm $original_source_file $tmp_source_file
+
+echo "Complete!"

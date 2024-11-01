@@ -1,0 +1,34 @@
+#! /bin/bash
+
+app_file=valsync.war
+source_file=~/wars/$app_file
+destination_file=/usr/local/tomcat/webapps/$app_file
+archive_file=~/wars.archive/$app_file.$(date +%Y%m%d%H%M%S)
+
+echo "===== Deploying Valsync Dev Environment ====="
+
+echo ">> Running as $(whoami) user"
+
+cd ~
+
+printf ">> Checking Source file: "
+if [[ -f $source_file ]]; then
+  printf "OK\n"
+  printf ">> Checking Destination file: "
+  if [[ -f $destination_file ]]; then
+    printf "OK (existing app, start archiving)\n"
+    mv $destination_file $archive_file
+  else
+    printf "OK (no archiving required)\n"
+  fi
+
+  echo "moving source to destination"
+  mv $source_file $destination_file
+  echo "move complete"
+else
+  printf "FAIL\n"
+  echo "$app_file source file does not exists"
+  exit 1
+fi
+
+echo ">> Complete"
