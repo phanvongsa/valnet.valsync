@@ -25,7 +25,6 @@ public class PegaServicesImpl implements PegaServices {
         this.pegaSyncingServices = pss;
     }
 
-
     @Override
     public StandardisedResponse test(String payload) {
         return new StandardisedResponse(pegaSyncingServices.executeRequest(PegaConfig.SyncServiceType.DATASYNC_PROPERTY_RELATED, payload));
@@ -94,4 +93,10 @@ logger.debug(Utils.object2Json(standardisedResponse));
             standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,errorMessage.toString());
         return standardisedResponse;
     }
+
+    @Override
+    public StandardisedResponse objections_rfidocs_proccessed(String payload) {
+        return new StandardisedResponse(pegaSyncingServices.executeRequest(PegaConfig.SyncServiceType.OBJECTION_RFIDOCS_PROCESSED, payload));
+    }
+
 }

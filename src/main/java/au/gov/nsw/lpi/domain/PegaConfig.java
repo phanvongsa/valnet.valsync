@@ -14,7 +14,8 @@ public class PegaConfig {
         DATASYNC_LAND_VALUE,
         DATASYNC_SUPPLEMENTARY_VALUATION,
         ATTACHMENTS_UPLOAD,
-        CASES_ATTACHMENTS_LINK;
+        CASES_ATTACHMENTS_LINK,
+        OBJECTION_RFIDOCS_PROCESSED;
     }
 
     public String base_api;
@@ -66,6 +67,9 @@ public class PegaConfig {
                 break;
             case DATASYNC_SUPPLEMENTARY_VALUATION:
                 api_endpoint += this.env.getProperty("pega.datasync.endpoints.supplementary_valuation");
+                break;
+            case OBJECTION_RFIDOCS_PROCESSED:
+                api_endpoint += this.env.getProperty("pega.datasync.endpoints.objection_rfidocs_processed");
                 break;
             default:
                 break;

@@ -18,4 +18,6 @@ public interface PegaServices {
 
     StandardisedResponse attachments_associate(String payload);
 
+    StandardisedResponse objections_rfidocs_proccessed(String payload);
+
 }

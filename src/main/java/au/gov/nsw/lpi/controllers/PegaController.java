@@ -63,6 +63,9 @@ public class PegaController extends BaseController {
             case "attachments/associate":
                 standardisedResponse = pegaServices.attachments_associate(requestBody);
                 break;
+            case "objections/rfidocs_processed":
+                standardisedResponse = pegaServices.objections_rfidocs_proccessed(requestBody);
+                break;
             default:
                 standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST,String.format("Invalid Request Action Call (%s)",entityAction));
                 break;
