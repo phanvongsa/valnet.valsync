@@ -46,12 +46,12 @@ logger.debug("raw_response: " + raw_response);
             }else if (jo.has("errorClassification") && jo.has("errorDetails")){
                 // standard pega based error response
                 this.httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-                StringBuilder errormessages = new StringBuilder();
+                StringBuilder error_messages = new StringBuilder();
                 jo.getAsJsonArray("errorDetails").forEach(e -> {
-                    errormessages.append(e.getAsJsonObject().get("message").getAsString()).append("\n");
-                    errormessages.append(e.getAsJsonObject().get("localizedValue").getAsString());
+                    error_messages.append(e.getAsJsonObject().get("message").getAsString()).append("\n");
+                    error_messages.append(e.getAsJsonObject().get("localizedValue").getAsString());
                 });
-                this.message = errormessages.toString();
+                this.message = error_messages.toString();
                 this.data = raw_response;
             } else
                 this.data = raw_response;
