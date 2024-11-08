@@ -2,9 +2,14 @@
 //*** package ***//
 $ mvn clean package -Plocal
 
+<<<<<<< HEAD
 -- run on docker builder-java
 ./build_project.sh valnet/valnet.valsync <build|upload|deploy> <local|dev|uat>
 
+=======
+-- run on docker machine
+##> mvn clean package -Plocal -f ./pom.xml ;wsl ./__tools.sh -p local -a deploy
+>>>>>>> dev
 
 //** **//
 -- run in docker as sys SQLPLUS>

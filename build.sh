@@ -51,9 +51,16 @@ if [[ "$action" =~ "build" || "$action" == "release" ]]; then
     echo "Build Error"
     exit 1
   fi
+<<<<<<< HEAD
 fi
 ### UPLOAD
 if [[ "$action" =~ "upload" || "$action" == "release" ]]; then
+=======
+
+fi
+### UPLOAD
+if [[ "$action" == "upload" || "$action" == "release" ]]; then  
+>>>>>>> dev
   echo "Uploading ==> WAR Server ($war_server)"
   
   if [[ -e "$release_file" ]]; then    
@@ -76,7 +83,11 @@ fi
 # -->   2.2  back up existing war file
 # -->   2.3  copy /home/{account}/wars/app.war to webapps/
 
+<<<<<<< HEAD
 if [[ "$action" =~ "deploy" || "$action" == "release" ]]; then
+=======
+if [[ "$action" == "deploy" || "$action" == "release" ]]; then
+>>>>>>> dev
   echo "Deploying Application ==> WEB Server ($profile)"
   
   echo "  ==> Applying profile server settings"
@@ -113,7 +124,11 @@ if [[ "$action" =~ "deploy" || "$action" == "release" ]]; then
         exit 1
         ;;
   esac
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> dev
   ## 0.  download war file war server
   printf "  Retrieving application from WAR Server  => \n"
   sshpass -p ${war_pw} scp ${war_un}@${war_server}:$war_directory/$app_name-$profile.war $local_war_directory
