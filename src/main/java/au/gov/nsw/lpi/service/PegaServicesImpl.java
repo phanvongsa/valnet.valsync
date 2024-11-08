@@ -63,11 +63,13 @@ public class PegaServicesImpl implements PegaServices {
         for(int i=0;i<ajo.size();i++){
             String attachment_name = ajo.get(i).getAsJsonObject().get("name").getAsString();
             logger.debug("  "+i+": "+ attachment_name);
-            String attachment_filepath = pegaSyncingServices.saveDocumentFile(ajo.get(i).getAsJsonObject().get("data").getAsString(),UUID.randomUUID().toString()+Utils.getFileExtension(attachment_name));
+            String tmp_filename__ = UUID.randomUUID()+Utils.getFileExtension(attachment_name);
+            String attachment_filepath = pegaSyncingServices.saveDocumentFile(ajo.get(i).getAsJsonObject().get("data").getAsString(),tmp_filename__);
             logger.debug("      ==> Saving as "+attachment_filepath);
             standardisedResponse = new StandardisedResponse(pegaSyncingServices.executeRequest(PegaConfig.SyncServiceType.ATTACHMENTS_UPLOAD, attachment_filepath));
             logger.debug("      ==> Uploading "+(standardisedResponse.code==StandardisedResponseCode.SUCCESS?"OK":"ERROR"));
             if(standardisedResponse.code == StandardisedResponseCode.SUCCESS){
+                pegaSyncingServices.cleanupDocumentFile(tmp_filename__);
                 Map<String, String> uploaded_attachment = new HashMap<>();
                 uploaded_attachment.put("type","File");
                 uploaded_attachment.put("category","File");
@@ -96,7 +98,7 @@ public class PegaServicesImpl implements PegaServices {
 
     @Override
     public StandardisedResponse objections_rfidocs_proccessed(String payload) {
-        return new StandardisedResponse(pegaSyncingServices.executeRequest(PegaConfig.SyncServiceType.OBJECTION_RFIDOCS_PROCESSED, payload));
+        return new StandardisedResponse(pegaSyncingServices.executeRequest(PegaConfig.SyncServiceType.OBJECTIONS_RFIDOCS_PROCESSED, payload));
     }
 
 }

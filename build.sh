@@ -12,9 +12,20 @@ target_file="/mnt/source/$project_name/target/$app_name-$profile.war"
 release_file="/mnt/release/$app_name-$profile.war"
 local_war_directory="/mnt/wars"
 deploy_file="/mnt/source/$project_name/deploy.$app_name.$profile"
+KNOWN_HOSTS_FILE="/root/.ssh/known_hosts"
+### add known hosts
+if ! grep -q "$web_app_server" "$KNOWN_HOSTS_FILE"; then
+  echo "Adding $web_app_server to known_hosts..."
+  ssh-keyscan $web_app_server >> "$KNOWN_HOSTS_FILE"
+fi
+
+if ! grep -q "$war_server" "$KNOWN_HOSTS_FILE"; then
+  echo "Adding $war_server to known_hosts..."
+  ssh-keyscan $war_server >> "$KNOWN_HOSTS_FILE"
+fi
 
 ### BUILD
-if [[ "$action" == "build" || "$action" == "release" ]]; then
+if [[ "$action" =~ "build" || "$action" == "release" ]]; then
   if [[ -e "$release_file" ]]; then
     echo "Cleaning up old release files"
     rm "$release_file"
@@ -40,10 +51,9 @@ if [[ "$action" == "build" || "$action" == "release" ]]; then
     echo "Build Error"
     exit 1
   fi
-
 fi
 ### UPLOAD
-if [[ "$action" == "upload" || "$action" == "release" ]]; then  
+if [[ "$action" =~ "upload" || "$action" == "release" ]]; then
   echo "Uploading ==> WAR Server ($war_server)"
   
   if [[ -e "$release_file" ]]; then    
@@ -66,7 +76,7 @@ fi
 # -->   2.2  back up existing war file
 # -->   2.3  copy /home/{account}/wars/app.war to webapps/
 
-if [[ "$action" == "deploy" || "$action" == "release" ]]; then
+if [[ "$action" =~ "deploy" || "$action" == "release" ]]; then
   echo "Deploying Application ==> WEB Server ($profile)"
   
   echo "  ==> Applying profile server settings"
@@ -103,7 +113,7 @@ if [[ "$action" == "deploy" || "$action" == "release" ]]; then
         exit 1
         ;;
   esac
-  
+
   ## 0.  download war file war server
   printf "  Retrieving application from WAR Server  => \n"
   sshpass -p ${war_pw} scp ${war_un}@${war_server}:$war_directory/$app_name-$profile.war $local_war_directory

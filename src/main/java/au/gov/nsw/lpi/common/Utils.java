@@ -92,6 +92,20 @@ public class Utils {
         }
     }
 
+    // delete file based on file path
+    public static String deleteFile(String file_path) {
+        try {
+            File file = Paths.get(file_path).toFile();
+            if (file.exists()) {
+                file.delete();
+                return file_path;
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+        return null;
+    }
+
     // get file extension from file name
     public static String getFileExtension(String file_name) {
         return file_name.substring(file_name.lastIndexOf("."));

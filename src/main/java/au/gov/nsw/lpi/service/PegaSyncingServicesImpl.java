@@ -23,18 +23,31 @@ import java.io.IOException;
 @Component
 public class PegaSyncingServicesImpl implements PegaSyncingServices {
     protected static final Logger logger = LoggerFactory.getLogger(PegaSyncingServices.class);
-    private final HttpClient dataSyncHttpClient;
-    private final HttpClient baseHttpClient;
+    private final HttpClient datasyncHttpClient;
+    private final HttpClient attachmentsHttpClient;
+    private final HttpClient casesHttpClient;
+
+    private final HttpClient objectionsHttpClient;
+
+
     private final PegaConfig cfg;
     public PegaSyncingServicesImpl(PegaConfig pegaConfig) {
         this.cfg = pegaConfig;
         CredentialsProvider dataSyncCredentialsProvider = new BasicCredentialsProvider();
         dataSyncCredentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(cfg.datasync_un, cfg.datasync_pw));
-        this.dataSyncHttpClient = HttpClients.custom().setDefaultCredentialsProvider(dataSyncCredentialsProvider).build();
+        this.datasyncHttpClient = HttpClients.custom().setDefaultCredentialsProvider(dataSyncCredentialsProvider).build();
 
-        CredentialsProvider baseCredentialsProvider = new BasicCredentialsProvider();
-        baseCredentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(cfg.datasync_un, cfg.datasync_pw));
-        this.baseHttpClient = HttpClients.custom().setDefaultCredentialsProvider(baseCredentialsProvider).build();
+        CredentialsProvider attachmentsCredentialsProvider = new BasicCredentialsProvider();
+        attachmentsCredentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(cfg.attachments_un, cfg.attachments_pw));
+        this.attachmentsHttpClient = HttpClients.custom().setDefaultCredentialsProvider(attachmentsCredentialsProvider).build();
+
+        CredentialsProvider casesCredentialsProvider = new BasicCredentialsProvider();
+        casesCredentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(cfg.cases_un, cfg.cases_pw));
+        this.casesHttpClient = HttpClients.custom().setDefaultCredentialsProvider(casesCredentialsProvider).build();
+
+        CredentialsProvider objectionsCredentialsProvider = new BasicCredentialsProvider();
+        objectionsCredentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(cfg.cases_un, cfg.cases_pw));
+        this.objectionsHttpClient = HttpClients.custom().setDefaultCredentialsProvider(objectionsCredentialsProvider).build();
     }
 
     @Override
@@ -79,10 +92,17 @@ public class PegaSyncingServicesImpl implements PegaSyncingServices {
         return Utils.saveBase64File(base64String_data, this.cfg.documents_upload_dir+"/"+fileName);
     }
 
+    @Override
+    public void cleanupDocumentFile(String fileName) {
+        if(this.cfg.documents_upload_cleanup)
+            Utils.deleteFile(this.cfg.documents_upload_dir+"/"+fileName);
+    }
+
     private HttpPost createRequestsPost(PegaConfig.SyncServiceType serviceType, String payload){
         HttpPost request = null;
         String api_endpoint = this.cfg.getApiEndpoint(serviceType);
-        logger.debug("Pega API Endpoint: "+api_endpoint);
+        logger.debug("createRequestsPost>>Pega Service Type: "+serviceType.toString());
+        logger.debug("createRequestsPost>>Pega API Endpoint: "+api_endpoint);
         switch (serviceType) {
             case CASES_ATTACHMENTS_LINK:
                 String entity_id = Utils.json2JsonObject(payload).getAsJsonObject("entity").get("id").getAsString();
@@ -112,6 +132,15 @@ public class PegaSyncingServicesImpl implements PegaSyncingServices {
     }
 
     private HttpClient getHttpClient(PegaConfig.SyncServiceType serviceType) {
-        return serviceType.toString().startsWith("DATASYNC_") ? this.dataSyncHttpClient : this.baseHttpClient;
+        switch (serviceType.toString().split("_")[0]){
+            case "ATTACHMENTS":
+                return this.attachmentsHttpClient;
+            case "CASES":
+                return this.casesHttpClient;
+            case "OBJECTIONS":
+                return this.objectionsHttpClient;
+            default:
+                return this.datasyncHttpClient;
+        }
     }
 }
