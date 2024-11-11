@@ -40,4 +40,4 @@ secrets.yml
 catalina.home_IS_UNDEFINED
 src/main/resources/
 .env
-builder.conf
+build.conf
