@@ -278,3 +278,9 @@ VALNET ==> VALIQ
 
     https://spadev.atlassian.net/wiki/spaces/VIAAD/pages/1839104080/Component+Sync+up+R2
     component sync up(R2)       TBD
+
+TEST CASES
+    PEC-VG-VALNET-WORK-SR RFI-18026
+    PEC-VG-VALNET-WORK-SR RFI-18027
+    PEC-VG-VALNET-WORK-SR RFI-18028
+    PEC-VG-VALNET-WORK-SR RFI-18029
