@@ -50,7 +50,7 @@ public class SecurityServiceImpl implements SecurityService {
     private void requestInfo(HttpServletRequest request){
         // Get all the header names
         Enumeration<String> headerNames = request.getHeaderNames();
-        logger.debug("===== Request Info =====");
+        logger.debug("===== Request Info "+request.getRequestURL().toString()+" =====");
         // Iterate through all the header names and get their values
         logger.debug("Remote Host: "+request.getRemoteHost());
         logger.debug("Remote Address: "+request.getRemoteAddr());
@@ -59,11 +59,10 @@ public class SecurityServiceImpl implements SecurityService {
         logger.debug("Forward For: "+request.getHeader("X-FORWARDED-FOR"));
         logger.debug("User-Agent: "+request.getHeader("User-Agent"));
         logger.debug("Content-Type: "+request.getHeader("Content-Type"));
-
         try {
             InetAddress addr = InetAddress.getByName(request.getRemoteAddr());
-            logger.debug("Remote Host Name: "+ addr.getHostName());
-            logger.debug("Remote Host Address: "+addr.getHostAddress());
+            logger.debug("Remote Host InetAddress: "+ addr.getHostName());
+            logger.debug("Remote Address InetAddress: "+addr.getHostAddress());
         } catch (UnknownHostException ex) {
             logger.error(ex.getMessage());
         }
