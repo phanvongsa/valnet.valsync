@@ -74,14 +74,14 @@ public class PegaController extends BaseController {
     }
 
 
-    private void setWithPegaResponse(StandardisedResponse standardisedResponse, Map<String,Object> pegaResponse){
-        logger.debug(Utils.object2Json(pegaResponse));
-        // updated to accept 200, 201, 202
-        if((int)pegaResponse.get("responseStatusCode")>= 200 && (int)pegaResponse.get("responseStatusCode")<= 202)
-            standardisedResponse.setData(pegaResponse.get("responseBody").toString());
-        else{
-            standardisedResponse.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            standardisedResponse.setData(pegaResponse.get("responseBody").toString());
-        }
-    }
+//    private void setWithPegaResponse(StandardisedResponse standardisedResponse, Map<String,Object> pegaResponse){
+//        logger.debug(Utils.object2Json(pegaResponse));
+//        // updated to accept 200, 201, 202
+//        if((int)pegaResponse.get("responseStatusCode")>= 200 && (int)pegaResponse.get("responseStatusCode")<= 202)
+//            standardisedResponse.setData(pegaResponse.get("responseBody").toString());
+//        else{
+//            standardisedResponse.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+//            standardisedResponse.setData(pegaResponse.get("responseBody").toString());
+//        }
+//    }
 }
