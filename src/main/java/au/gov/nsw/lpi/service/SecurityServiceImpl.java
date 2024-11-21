@@ -52,6 +52,7 @@ public class SecurityServiceImpl implements SecurityService {
         Enumeration<String> headerNames = request.getHeaderNames();
         logger.debug("===== Request Info "+request.getRequestURL().toString()+" =====");
         // Iterate through all the header names and get their values
+        logger.debug("Local Address: "+request.getLocalAddr());
         logger.debug("Remote Host: "+request.getRemoteHost());
         logger.debug("Remote Address: "+request.getRemoteAddr());
         logger.debug("Referer: "+request.getHeader("Referer"));
