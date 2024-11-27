@@ -8,8 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
@@ -35,6 +37,7 @@ public class SecurityServiceImpl implements SecurityService {
             return false;
 
         // check allowed ips
+        // TODO: change to local address where the request is coming from
         return this.allowedIps.equals("*") || Utils.isInCommaDelimitedList(this.allowedIps, Utils.getRequestRemoteAddress(request));
     }
 
@@ -50,16 +53,13 @@ public class SecurityServiceImpl implements SecurityService {
     private void requestInfo(HttpServletRequest request){
         // Get all the header names
         Enumeration<String> headerNames = request.getHeaderNames();
-        logger.debug("===== Request Info "+request.getRequestURL().toString()+" =====");
+        logger.debug("===== Request "+request.getRequestURL().toString()+" =====");
         // Iterate through all the header names and get their values
         logger.debug("Local Address: "+request.getLocalAddr());
         logger.debug("Remote Host: "+request.getRemoteHost());
         logger.debug("Remote Address: "+request.getRemoteAddr());
-        logger.debug("Referer: "+request.getHeader("Referer"));
-        logger.debug("Origin: "+request.getHeader("Origin"));
-        logger.debug("Forward For: "+request.getHeader("X-FORWARDED-FOR"));
-        logger.debug("User-Agent: "+request.getHeader("User-Agent"));
-        logger.debug("Content-Type: "+request.getHeader("Content-Type"));
+        logger.debug("Remote Address (Utils): "+Utils.getRequestRemoteAddress(request));
+        logger.debug(">>> InetAddress");
         try {
             InetAddress addr = InetAddress.getByName(request.getRemoteAddr());
             logger.debug("Remote Host InetAddress: "+ addr.getHostName());
@@ -67,6 +67,12 @@ public class SecurityServiceImpl implements SecurityService {
         } catch (UnknownHostException ex) {
             logger.error(ex.getMessage());
         }
+        logger.debug(">>> Headers");
+        logger.debug("Referer: "+request.getHeader("Referer"));
+        logger.debug("Origin: "+request.getHeader("Origin"));
+        logger.debug("Forward For: "+request.getHeader("X-FORWARDED-FOR"));
+        logger.debug("User-Agent: "+request.getHeader("User-Agent"));
+        logger.debug("Content-Type: "+request.getHeader("Content-Type"));
 
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
@@ -77,7 +83,7 @@ public class SecurityServiceImpl implements SecurityService {
                     logger.debug(headerName + ": " + headerValue);
                 }
             }
-
         }
+        logger.debug("===========================================================");
     }
 }

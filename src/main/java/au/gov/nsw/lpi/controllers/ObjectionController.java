@@ -50,6 +50,9 @@ public class ObjectionController extends BaseController {
                     standardisedResponse = ps.objections_rfidocs_proccessed(jo_request_body.toString());
                 }
                 break;
+            case "getsalesanalysisreport":
+                standardisedResponse.setData(dao.get_sales_analysis_report(requestBody));
+                break;
             default:
                 standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST, "Invalid Request Action Call");
                 break;
