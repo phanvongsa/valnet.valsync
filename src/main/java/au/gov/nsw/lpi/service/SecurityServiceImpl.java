@@ -37,13 +37,12 @@ public class SecurityServiceImpl implements SecurityService {
             return false;
 
         // check allowed ips
-        // TODO: change to local address where the request is coming from
         return this.allowedIps.equals("*") || Utils.isInCommaDelimitedList(this.allowedIps, Utils.getRequestRemoteAddress(request));
     }
 
     @Override
     public StandardisedResponse requestSecurityCheck(HttpServletRequest request) {
-        requestInfo(request);
+//        requestInfo(request);
         if(isRequestValid(request))
             return new StandardisedResponse(HttpStatus.OK,null);
 

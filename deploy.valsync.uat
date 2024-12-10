@@ -6,6 +6,7 @@ archive_file=/home/tomcat/wars.archive/$app_file.$(date +%Y%m%d%H%M%S)
 original_source_file=/home/valro/wars/$app_file
 tmp_source_file=/tmp/$app_file
 
+echo "===== Deploying Valsync UAT Environment ====="
 echo "==================="
 printf "Running as (0) "
 whoami

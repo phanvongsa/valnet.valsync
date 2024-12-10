@@ -5,7 +5,7 @@ source_file=~/wars/$app_file
 destination_file=/usr/local/tomcat/webapps/$app_file
 archive_file=~/wars.archive/$app_file.$(date +%Y%m%d%H%M%S)
 
-echo "===== Deploying Valsync Dev Environment ====="
+echo "===== Deploying Valsync Local Environment ====="
 
 echo ">> Running as $(whoami) user"
 
