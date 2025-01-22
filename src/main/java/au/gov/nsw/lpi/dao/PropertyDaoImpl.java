@@ -11,6 +11,8 @@ public class PropertyDaoImpl extends BaseDaoImp implements PropertyDao {
     private String upsert_supplementary_value_procedurename = "SUPPLEMENTRY_VAL_GET_JSON_DATA";
     private String cancel_supplementary_value_procedurename = "CANCEL_SUPP_VAL_GET_JSON_DATA";
     private String remove_supplementary_value_procedurename = "REMOVE_PROPERTY_GET_JSON_DATA";
+    private String get_sales_analysis_procedurename = "FUNC_PLACEHOLDER";
+
     public PropertyDaoImpl(DataSource dataSource) {
         super(dataSource);
     }
@@ -18,6 +20,11 @@ public class PropertyDaoImpl extends BaseDaoImp implements PropertyDao {
     @Override
     public String upsert(String payload) {
         return runStandardProcedure(this.upsert_procedurename,payload);
+    }
+
+    @Override
+    public String get_sales_analysis(String payload) {
+        return runStandardProcedure(this.get_sales_analysis_procedurename,payload);
     }
 
     @Override
