@@ -18,6 +18,7 @@ public class PegaConfig {
         OBJECTIONS_RFIDOCS_PROCESSED;
     }
 
+    private String base_api;
     public String datasync_api;
     public String datasync_un;
     public String datasync_pw;
@@ -43,24 +44,26 @@ public class PegaConfig {
     };
 
     public void init(){
-        this.datasync_api= env.getProperty("pega.datasync.api");
+        this.base_api = env.getProperty("pega.base.api");
+
+        this.datasync_api = this.base_api+env.getProperty("pega.datasync.api");
         this.datasync_un = env.getProperty("pega.datasync.un");
         this.datasync_pw = env.getProperty("pega.datasync.pw");
 
-        this.attachments_api = env.getProperty("pega.attachments.api");
+        this.attachments_api = this.base_api+env.getProperty("pega.attachments.api");
         this.attachments_un = env.getProperty("pega.attachments.un");
         this.attachments_pw = env.getProperty("pega.attachments.pw");
 
-        this.cases_api = env.getProperty("pega.cases.api");
+        this.cases_api = this.base_api+env.getProperty("pega.cases.api");
         this.cases_un = env.getProperty("pega.cases.un");
         this.cases_pw = env.getProperty("pega.cases.pw");
 
-        this.objections_api = env.getProperty("pega.objections.api");
+        this.objections_api = this.base_api+env.getProperty("pega.objections.api");
         this.objections_un = env.getProperty("pega.objections.un");
         this.objections_pw = env.getProperty("pega.objections.pw");
 
         this.documents_upload_dir = env.getProperty("documents.upload.dir");
-        this.documents_upload_cleanup = env.containsProperty("documents.upload.cleanup")&& Objects.equals(env.getProperty("documents.upload.cleanup"), "true");
+        this.documents_upload_cleanup = env.containsProperty("documents.upload.cleanup") && Objects.equals(env.getProperty("documents.upload.cleanup"), "true");
     }
 
     public String getApiEndpoint(SyncServiceType serviceType){
