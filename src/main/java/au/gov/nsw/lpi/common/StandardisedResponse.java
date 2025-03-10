@@ -104,17 +104,28 @@ logger.debug("raw_response: " + raw_response);
         this.httpStatus = httpStatus;
         initialiseCodeMessage();
     }
-    public void setData(Object data){
-        if(data.toString().toLowerCase().contains("error")){
-            this.httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            initialiseCodeMessage();
-        }
 
-        if(data instanceof String && Utils.isValidJson(data.toString())){
+    public void setData(Object data){
+        // check if json object, if so check if has error attribute
+
+        // Response is JSON
+        if (data instanceof String && Utils.isValidJson(data.toString())){
+            // if response is json object and has an error attribute
+            if(Utils.getJsonObjectType(data.toString()) == JsonObjectType.OBJECT){
+                JsonObject jo = Utils.json2JsonObject(data.toString());
+                if(jo.has("error"))
+                    setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            // if its an array then thats fine
             this.data = Utils.json2Object(data.toString());
         }
-        else
+        else { // Response is raw string
+            if(data.toString().toLowerCase().contains("error")){
+                setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
             this.data = data;
+        }
     }
 
     private String getResponseBody(HttpResponse response){

@@ -27,10 +27,37 @@ public class Utils {
         return standardisedResponse.getResponseEntity();
     }
 
+    public static JsonObjectType getJsonObjectType(String jsonString){
+        if(isValidJsonObject(jsonString))
+            return JsonObjectType.OBJECT;
+        else if(isValidJsonArray(jsonString))
+            return JsonObjectType.ARRAY;
+        else
+            return JsonObjectType.INVALID;
+    }
+
     public static boolean isValidJson(String jsonString) {
         try {
             JsonElement jsonElement = JsonParser.parseString(jsonString);
             return jsonElement.isJsonObject() || jsonElement.isJsonArray();
+        } catch (JsonSyntaxException e) {
+            return false;
+        }
+    }
+
+    public static boolean isValidJsonArray(String jsonString) {
+        try {
+            JsonElement jsonElement = JsonParser.parseString(jsonString);
+            return jsonElement.isJsonArray();
+        } catch (JsonSyntaxException e) {
+            return false;
+        }
+    }
+
+    public static boolean isValidJsonObject(String jsonString) {
+        try {
+            JsonElement jsonElement = JsonParser.parseString(jsonString);
+            return jsonElement.isJsonObject();
         } catch (JsonSyntaxException e) {
             return false;
         }

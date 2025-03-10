@@ -214,7 +214,48 @@ CREATE OR REPLACE PACKAGE BODY VN_PEGA_INTEGRATION_API AS
         -- Your implementation code
         flog('FUNCTION CALL','NOV_PREF_SEND_JSON_DATA',p1);
         COMMIT;
-        RETURN 'SUCCESS';
+        RETURN '
+        [
+            {
+              "propID": 536291,
+              "preference": "Email",
+              "comm_value": "rorato@billabongprod.com.au"
+            },
+            {
+              "propID": 1111111111,
+              "error": "Proeprty Does not exist"
+            },
+            {
+              "propID": 12345,
+              "preference": "POSTAL",
+              "full_address": "205 MAITLAND ST, KURRI KURRI NSW 2327    ",
+              "address_type": "STREET",
+              "street_name": "MAITLAND",
+              "street_type": "ST",
+              "suburb_name": "KURRI KURRI",
+              "house_num": 205,
+              "postal_code": "2327",
+              "state": "NSW"
+            },
+            {
+              "propID": 1132715,
+              "preference": "Email",
+              "comm_value": "email@hillstratasolutions.com.au"
+            },
+            {
+              "propID": 235567,
+              "preference": "POSTAL",
+              "full_address": "77 LINDSAY ST, HAMILTON NSW 2303    ",
+              "address_type": "STREET",
+              "street_name": "LINDSAY",
+              "street_type": "ST",
+              "suburb_name": "HAMILTON",
+              "house_num": 77,
+              "postal_code": "2303",
+              "state": "NSW"
+            }
+          ]
+        ';
       END NOV_PREF_SEND_JSON_DATA;
 
     FUNCTION FUNC_PLACEHOLDER(p1 Clob) RETURN Clob IS
