@@ -113,11 +113,16 @@ logger.debug("raw_response: " + raw_response);
             // if response is json object and has an error attribute
             if(Utils.getJsonObjectType(data.toString()) == JsonObjectType.OBJECT){
                 JsonObject jo = Utils.json2JsonObject(data.toString());
-                if(jo.has("error"))
+                boolean hasError = jo.keySet().stream().anyMatch(key -> key.equalsIgnoreCase("error"));
+                if(hasError){
                     setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                    String errorKey = jo.keySet().stream().filter(k -> k.equalsIgnoreCase("error")).findFirst().orElse(null);
+                    this.message = jo.get(errorKey).getAsString();
+                    //this.message = jo.keySet().stream().filter(k -> k.equalsIgnoreCase("error")).findFirst().orElse(null);
+                }
             }
 
-            // if its an array then thats fine
+            // if it's an array then thats fine
             this.data = Utils.json2Object(data.toString());
         }
         else { // Response is raw string
