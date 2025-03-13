@@ -9,7 +9,7 @@ public class ObjectionDaoImpl extends BaseDaoImp implements ObjectionDao{
 
     private final String request_for_information_kit_procedurename = "INFORMATION_KIT_GET_JSON_DATA";
 
-    private final String get_sales_analysis_report_procedurename = "FUNC_PLACEHOLDER";
+    private final String get_sales_analysis_report_procedurename = "RT_SALES_ANALYS_SEND_JSON_DATA";
 
     public ObjectionDaoImpl(DataSource dataSource) {
         super(dataSource);

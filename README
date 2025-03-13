@@ -64,6 +64,7 @@ CREATE OR REPLACE PACKAGE VN_PEGA_INTEGRATION_API AS
   FUNCTION INFORMATION_KIT_GET_JSON_DATA(p1 Clob) RETURN Clob;
   FUNCTION SALES_REPORT_SEND_JSON_DATA(p1 Clob) RETURN Clob;
   FUNCTION NOV_PREF_SEND_JSON_DATA(p1 Clob) RETURN Clob;
+  FUNCTION RT_SALES_ANALYS_SEND_JSON_DATA(p1 Clob) RETURN Clob;
   FUNCTION FUNC_PLACEHOLDER(p1 Clob) RETURN Clob;
 
   -- Declare other package elements as needed
@@ -257,6 +258,17 @@ CREATE OR REPLACE PACKAGE BODY VN_PEGA_INTEGRATION_API AS
           ]
         ';
       END NOV_PREF_SEND_JSON_DATA;
+
+    FUNCTION RT_SALES_ANALYS_SEND_JSON_DATA(p1 Clob) RETURN Clob IS
+        -- Function logic goes here
+        -- You can use PL/SQL statements, variables, and other constructs
+        pragma autonomous_transaction;
+      BEGIN
+        -- Your implementation code
+        flog('FUNCTION CALL','RT_SALES_ANALYS_SEND_JSON_DATA',p1);
+        COMMIT;
+        RETURN 'SUCCESS';
+      END RT_SALES_ANALYS_SEND_JSON_DATA;
 
     FUNCTION FUNC_PLACEHOLDER(p1 Clob) RETURN Clob IS
         -- Function logic goes here
