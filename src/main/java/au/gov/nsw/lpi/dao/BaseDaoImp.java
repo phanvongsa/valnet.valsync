@@ -32,9 +32,10 @@ public abstract class BaseDaoImp implements BaseDao {
                 Clob clob = connection.createClob();
                 clob.setString(1, payload);
                 cs.setClob(2, clob);
-                cs.registerOutParameter(1, Types.VARCHAR);
+                cs.registerOutParameter(1, Types.CLOB);
                 cs.execute();
-                return cs.getString(1);
+                Clob clobResponse = cs.getClob(1);
+                return (clobResponse != null) ? clobResponse.getSubString(1, (int) clobResponse.length()) : "";
             }
         }catch (Exception e){
             logger.error(e.getMessage());

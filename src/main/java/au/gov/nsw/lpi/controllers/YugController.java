@@ -82,8 +82,11 @@ public class YugController{
 
         String payload = Utils.json2JsonObject(requestBody).get("payload").toString();
         switch (actionName.toLowerCase()){
-            case "dao.request_for_information_kit":
-                standardisedResponse.data = this.objectionDao.request_for_information_kit(payload);
+            case "objectiondao.request_for_information_kit":
+                standardisedResponse.setData(this.objectionDao.request_for_information_kit(payload));
+                break;
+            case "objectiondao.get_sales_analysis_report":
+                standardisedResponse.setData(this.objectionDao.get_sales_analysis_report(payload));
                 break;
             default:
                 standardisedResponse = new StandardisedResponse(HttpStatus.BAD_REQUEST, "Invalid Request Action Call");
