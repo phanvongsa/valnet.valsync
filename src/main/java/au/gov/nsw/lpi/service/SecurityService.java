@@ -7,4 +7,6 @@ public interface SecurityService {
     boolean isRequestValid(HttpServletRequest request);
 
     StandardisedResponse requestSecurityCheck(HttpServletRequest request);
+
+    StandardisedResponse requestSecurityCheckYug(HttpServletRequest request, String requestBody);
 }

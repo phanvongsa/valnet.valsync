@@ -24,6 +24,5 @@ public class ObjectionDaoImpl extends BaseDaoImp implements ObjectionDao{
     public String get_sales_analysis_report(String payload) {
         return runStandardProcedure(this.get_sales_analysis_report_procedurename,payload);
     }
-
-
+    
 }

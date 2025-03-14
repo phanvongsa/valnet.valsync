@@ -4,6 +4,7 @@ import au.gov.nsw.lpi.common.StandardisedResponse;
 import au.gov.nsw.lpi.common.Utils;
 import au.gov.nsw.lpi.controllers.BaseController;
 import au.gov.nsw.lpi.domain.ServerConfig;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -31,22 +32,33 @@ public class SecurityServiceImpl implements SecurityService {
 
     @Override
     public boolean isRequestValid(HttpServletRequest request) {
-
-        // check request header api key matches expected
-        if(request.getHeader(this.apiKeyName)== null || !request.getHeader(this.apiKeyName).equals(this.apiKey))
-            return false;
-
-        // check allowed ips
-        return this.allowedIps.equals("*") || Utils.isInCommaDelimitedList(this.allowedIps, Utils.getRequestRemoteAddress(request));
+        return request.getHeader(this.apiKeyName) != null && request.getHeader(this.apiKeyName).equals(this.apiKey);
     }
 
     @Override
     public StandardisedResponse requestSecurityCheck(HttpServletRequest request) {
-//        requestInfo(request);
         if(isRequestValid(request))
             return new StandardisedResponse(HttpStatus.OK,null);
 
         return new StandardisedResponse(HttpStatus.UNAUTHORIZED, null);
+    }
+
+    @Override
+    public StandardisedResponse requestSecurityCheckYug(HttpServletRequest request, String requestBody) {
+        //StandardisedResponse standardisedResponse = new StandardisedResponse(HttpStatus.OK,null);
+
+        if(!isRequestValid(request))
+            return new StandardisedResponse(HttpStatus.UNAUTHORIZED,null);
+
+        if(!Utils.isValidJsonObject(requestBody))
+            return new StandardisedResponse(HttpStatus.BAD_REQUEST,null);
+
+        JsonObject joreq = Utils.json2JsonObject(requestBody);
+        if(!(joreq.has("secKey") && joreq.get("secKey").getAsString().equals("iL0v3Guy!")))
+            return new StandardisedResponse(HttpStatus.FORBIDDEN,null);
+
+        return new StandardisedResponse(HttpStatus.OK,null);
+
     }
 
     private void requestInfo(HttpServletRequest request){
